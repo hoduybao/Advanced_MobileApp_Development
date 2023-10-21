@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Login/Login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home: Login());
+        home: Home());
   }
 }
 

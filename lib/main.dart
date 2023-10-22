@@ -1,5 +1,6 @@
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Login/Login.dart';
+import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,11 +18,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'LetTutor',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home: Home());
+        home: Schedule());
   }
 }
 

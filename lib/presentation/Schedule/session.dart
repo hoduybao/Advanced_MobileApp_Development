@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Session extends StatefulWidget {
-  const Session({super.key});
+  final String typeSession;
+  final String time_or_number;
+  const Session({super.key,required this.typeSession,required this.time_or_number});
 
   @override
   State<Session> createState() => _SessionState();
 }
 
 class _SessionState extends State<Session> {
-  bool _customIcon=false;
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 20),
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
-          color: Color.fromARGB(255,241, 241, 241), borderRadius: BorderRadius.circular(5)),
+          color: Color.fromARGB(255, 241, 241, 241),
+          borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -25,9 +27,9 @@ class _SessionState extends State<Session> {
             "Thu, 26 Oct 23",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           ),
-          Text("1 lesson"),
+          Text(widget.time_or_number),
           Container(
-            margin: EdgeInsets.only(top:15),
+            margin: EdgeInsets.only(top: 15),
             padding: EdgeInsets.all(15),
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(3)),
@@ -57,7 +59,7 @@ class _SessionState extends State<Session> {
                     Text(
                       "Keegan",
                       style:
-                      TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                     ),
                     Row(
                       children: [
@@ -83,7 +85,11 @@ class _SessionState extends State<Session> {
                     ),
                     Row(
                       children: [
-                        Icon(Icons.message_outlined,size: 18,color: Colors.blueAccent,),
+                        Icon(
+                          Icons.message_outlined,
+                          size: 18,
+                          color: Colors.blueAccent,
+                        ),
                         SizedBox(
                           width: 3,
                         ),
@@ -102,8 +108,8 @@ class _SessionState extends State<Session> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top:15),
-            padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+            margin: EdgeInsets.only(top: 15),
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(3)),
             child: Column(
@@ -111,96 +117,329 @@ class _SessionState extends State<Session> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("03:30 - 03:55",style: TextStyle(
-                      fontSize: 18,
-                    ),),
-                    TextButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          side: MaterialStateProperty.all(
-                            BorderSide(
-                              color: Colors.red, // Border color
-                              width: 1.0, // Border width
+                    Text(
+                      widget.typeSession=="Schedule"?
+                      "03:30 - 03:55" : "Lesson Time: 03:30 - 03:55",
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    Visibility(
+                      visible: widget.typeSession=="Schedule",
+                      child: TextButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                            side: MaterialStateProperty.all(
+                              BorderSide(
+                                color: Colors.red, // Border color
+                                width: 1.0, // Border width
+                              ),
+                            ),
+                            minimumSize: MaterialStateProperty.all(Size(40, 30)),
+                            padding: MaterialStateProperty.all(
+                                EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                    vertical: 5)), // Điều chỉnh lề cho TextButton
+                            backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                            shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(4), // Đặt góc bo tròn
+                              ),
                             ),
                           ),
-                          minimumSize: MaterialStateProperty.all(
-                              Size(40, 30)),
-                          padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                              horizontal: 13,
-                              vertical: 5)), // Điều chỉnh lề cho TextButton
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4), // Đặt góc bo tròn
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.cancel,color: Colors.red, size: 17,),
-                            SizedBox(width: 5,),
-                            Text(
-                              "Cancel",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.red),
-                            ),
-                          ],
-                        ))
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                                size: 17,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                "Cancel",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.red),
+                              ),
+                            ],
+                          )),
+                    )
+
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 10,bottom: 10),
+                  margin: EdgeInsets.only(top: 10, bottom: 0),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2),
-                      border: Border.all(
-                          color: Colors.grey,
-                          width: 0.5
-                      )
-
-                  ),
+                      border: Border.all(color: Colors.grey, width: 0.5)),
                   child: Theme(
-                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    data: Theme.of(context)
+                        .copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
                       title: Container(
-
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Request for lesson"),
-                            Text("Edit",style: TextStyle(
-                                color: Colors.blueAccent
-                            ),)
+                            Text("Request for lesson",style: TextStyle(
+                              fontSize: 16
+                            ),),
+                            Visibility(
+                              visible: widget.typeSession=="Schedule",
+                              child: Text(
+                                "Edit",
+                                style: TextStyle(color: Colors.blueAccent),
+                              ),
+                            )
                           ],
                         ),
                       ),
-
                       children: [
-
                         Container(
+                          width: double.infinity,
                             padding: EdgeInsets.all(20),
                             decoration: BoxDecoration(
                                 border: Border(
-                                  top: BorderSide(
-                                    color: Colors.grey,  // Color of the top border
-                                    width: 0.5,           // Width of the top border
-                                  ),
-                                )
-                            ),
-
-                            child: Text("Currently there are no requests for this class. Please write down any requests for the teacher."))
+                              top: BorderSide(
+                                color: Colors.grey, // Color of the top border
+                                width: 0.5, // Width of the top border
+                              ),
+                            )),
+                            child: Text(
+                                "Hello word",style: TextStyle(
+                              fontSize: 14
+                            ),))
                       ],
-                      onExpansionChanged: (bool expanded){
-                        setState(() {
-                          _customIcon=expanded;
-                        });
-                      },
+
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
                   ),
                 ),
+                Visibility(
+                  visible: widget.typeSession=="History",
+                  child: Container(
+                    margin: EdgeInsets.only(top: 0, bottom: 0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: Colors.grey, width: 0.5)),
+                    child: Theme(
+                      data: Theme.of(context)
+                          .copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Review from tutor",style: TextStyle(
+                                fontSize: 16
+                              ),),
 
+                            ],
+                          ),
+                        ),
+                        children: [
+                          Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    top: BorderSide(
+                                      color: Colors.grey, // Color of the top border
+                                      width: 0.5, // Width of the top border
+                                    ),
+                                  )),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "Session 1: 03:30 - 03:55",style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14
+                                  ),),
+                                  Text(
+                                    "Lesson status: Completed - Page 40",
+                                  style: TextStyle(
+                                    fontSize: 14
+                                  ),),
+                                  Text(
+                                    "Lesson progress: Completed",
+                                    style: TextStyle(
+                                        fontSize: 14
+                                    ),),
+                                  Wrap(
+
+                                    children: [
+                                      Text(
+                                        "Behavior (",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Text(
+                                        "): ",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Text(
+                                        "good",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+
+                                    ],
+                                  ),
+                                  Wrap(
+
+                                    children: [
+                                      Text(
+                                        "Listening (",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Text(
+                                        "): ",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Text(
+                                        "good",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+
+                                    ],
+                                  ),
+                                  Wrap(
+
+                                    children: [
+                                      Text(
+                                        "Speaking (",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Text(
+                                        "): ",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Text(
+                                        "good",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+
+                                    ],
+                                  ),
+                                  Wrap(
+
+                                    children: [
+                                      Text(
+                                        "Vocalbulary (",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Icon(Icons.star,color: CupertinoColors.systemYellow,size: 16,),
+                                      Text(
+                                        "): ",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+                                      Text(
+                                        "good",
+                                        style: TextStyle(
+                                            fontSize: 14
+                                        ),),
+
+                                    ],
+                                  ),
+                              Text(
+                                "Overall comment: We finished this lesson",
+                                style: TextStyle(
+                                    fontSize: 14
+                                ),),
+
+                                ],
+                              ))
+                        ],
+
+                        controlAffinity: ListTileControlAffinity.leading,
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: widget.typeSession=="History",
+                  child: Container(
+                      padding: EdgeInsets.only(left: 20,top: 20,bottom: 20,right: 10),
+                    margin: EdgeInsets.only(top: 0, bottom: 0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: Colors.grey, width: 0.5)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "Rating: ",
+                                  style: TextStyle(
+                                      fontSize: 14
+                                  ),),
+                                Icon(Icons.star,color: CupertinoColors.systemYellow,size: 18,),
+                                Icon(Icons.star,color: CupertinoColors.systemYellow,size: 18,),
+                                Icon(Icons.star,color: CupertinoColors.systemYellow,size: 18,),
+                                Icon(Icons.star,color: CupertinoColors.systemYellow,size: 18,),
+                                Icon(Icons.star,color: CupertinoColors.systemYellow,size: 18,),
+                              ],
+                            ),
+                            Wrap(
+                              spacing: 15,
+                              children: [
+                                Text(
+                                  "Edit",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.blueAccent
+
+                                  ),),
+                                Text(
+                                  "Report",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                    color: Colors.blueAccent
+                                  ),),
+                              ],
+                            )
+
+
+                          ]
+                      ),
+
+                  ),
+                )
 
               ],
             ),

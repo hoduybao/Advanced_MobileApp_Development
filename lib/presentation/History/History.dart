@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
-class Schedule extends StatelessWidget {
-  const Schedule({super.key});
+class History extends StatelessWidget {
+  const History({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
-              const Size.fromHeight(60.0), // Define the height of the AppBar
+          const Size.fromHeight(60.0), // Define the height of the AppBar
           child: Container(
             decoration: BoxDecoration(
               boxShadow: [
@@ -31,7 +31,7 @@ class Schedule extends StatelessWidget {
                   statusBarColor: Colors.black,
                   // Status bar brightness (optional)
                   statusBarIconBrightness:
-                      Brightness.light, // For Android (dark icons)
+                  Brightness.light, // For Android (dark icons)
                 ),
                 title: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,9 +59,9 @@ class Schedule extends StatelessWidget {
                   ],
                 )
 
-                // Replace 'assets/icon.png' with your image path
+              // Replace 'assets/icon.png' with your image path
 
-                ),
+            ),
           ),
         ),
         body: SingleChildScrollView(
@@ -70,37 +70,36 @@ class Schedule extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    Icons.calendar_month,
-                    color: Colors.blueAccent,
-                    size: 130,
+                  SvgPicture.asset(
+                    'images/history.svg', // Replace with the path to your SVG file
+                     // Adjust the height as needed
                   ),
                   SizedBox(
                     height: 20,
                   ),
                   Text(
-                    "Schedule",
+                    "History",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 10, bottom: 20),
                     decoration: BoxDecoration(
                         border: Border(
-                      left: BorderSide(
-                        color: Colors.grey, // Color of the left border
-                        width: 2.5, // Width of the left border
-                      ),
-                    )),
+                          left: BorderSide(
+                            color: Colors.grey, // Color of the left border
+                            width: 2.5, // Width of the left border
+                          ),
+                        )),
                     padding: EdgeInsets.only(left: 10),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Here is a list of the sessions you have booked",
+                            "The following is a list of lessons you have attended",
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
-                              "You can track when the meeting starts, join the meeting with one click or can cancel the meeting before 2 hours",
+                              "You can review the details of the lessons you have attended",
                               style: TextStyle(fontSize: 16)),
                         ]),
                   ),
@@ -111,9 +110,8 @@ class Schedule extends StatelessWidget {
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     children: [
-                      Session(typeSession:"Schedule",time_or_number: '1 lesson'),
-                      Session(typeSession:"Schedule",time_or_number: "1 lesson",),
-
+                      Session(typeSession:"History",time_or_number: "6 hours ago",),
+                      Session(typeSession:"History",time_or_number: "6 hours ago",),
                     ],
                   ),
 

@@ -1,4 +1,5 @@
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
+import 'package:advanced_mobileapp_development/presentation/Home/timeRange.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -78,7 +79,8 @@ class Home extends StatelessWidget {
             endIndent: 10, // Line indent on the right
           ),
 
-         ListTutors()
+         ListTutors(),
+
         ]))));
   }
 }

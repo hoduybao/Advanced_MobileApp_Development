@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/presentation/Home/timeRange.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +80,7 @@ class _SearchTutorState extends State<SearchTutor> {
               Expanded(
                 flex: 4,
                 child: Container(
-                  height: 37,
+                  height: 40,
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -93,7 +94,7 @@ class _SearchTutorState extends State<SearchTutor> {
                     //onChanged: (value)=>_runFilter(value),
                     decoration: InputDecoration(
                         contentPadding:
-                        EdgeInsets.only(top: -15, left: 5, right: 2),
+                        EdgeInsets.only(top: -12, left: 5, right: 2),
                         border: InputBorder.none,
                         hintText: "Enter tutor name...",
                         hintStyle: TextStyle(
@@ -101,7 +102,7 @@ class _SearchTutorState extends State<SearchTutor> {
                     style: TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w400,
-                        fontSize: 15),
+                        fontSize: 16),
                   ),
                 ),
               ),
@@ -111,7 +112,7 @@ class _SearchTutorState extends State<SearchTutor> {
               Expanded(
                 flex: 3,
                 child: Container(
-                  height: 37,
+                  height: 40,
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -125,7 +126,7 @@ class _SearchTutorState extends State<SearchTutor> {
                     //onChanged: (value)=>_runFilter(value),
                     decoration: InputDecoration(
                         contentPadding:
-                        EdgeInsets.only(top: -15, left: 5, right: 2),
+                        EdgeInsets.only(top: -12, left: 5, right: 2),
                         border: InputBorder.none,
                         hintText: "Select tutor nation",
                         hintStyle: TextStyle(
@@ -133,7 +134,7 @@ class _SearchTutorState extends State<SearchTutor> {
                     style: TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w400,
-                        fontSize: 15),
+                        fontSize: 16),
                   ),
                 ),
               )
@@ -154,8 +155,8 @@ class _SearchTutorState extends State<SearchTutor> {
             height: 5,
           ),
           Container(
-            height: 37,
-            width: 150,
+            height: 40,
+            width: 160,
             padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             decoration: BoxDecoration(
               border: Border.all(
@@ -183,7 +184,7 @@ class _SearchTutorState extends State<SearchTutor> {
               },
               //onChanged: (value)=>_runFilter(value),
               decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(top: -2, left: 13, right: 2),
+                  contentPadding: EdgeInsets.only(top: 1, left: 13, right: 2),
                   border: InputBorder.none,
                   hintText: "Select a day",
                   hintStyle: TextStyle(
@@ -198,93 +199,11 @@ class _SearchTutorState extends State<SearchTutor> {
               style: TextStyle(
                 color: Colors.black87,
                 fontWeight: FontWeight.w400,
-                fontSize: 15,
+                fontSize: 16,
               ),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 10),
-            child: Row(
-              children: [
-                Container(
-                  height: 37,
-                  width: 150,
-                  padding: EdgeInsets.only(top: 0, left: 0, right: 0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey, // Màu của biên
-                      width: 1.0, // Độ rộng của biên
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    //onChanged: (value)=>_runFilter(value),
-                    decoration: InputDecoration(
-                      contentPadding:
-                      EdgeInsets.only(top: -2, left: 13, right: 0),
-                      border: InputBorder.none,
-                      hintText: "Start time",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.watch_later_outlined,
-                        color: Colors.black54,
-                        size: 20,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward,
-                  color: Colors.grey,
-                ),
-                Container(
-                  height: 37,
-                  width: 150,
-                  padding: EdgeInsets.only(top: 0, left: 0, right: 0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey, // Màu của biên
-                      width: 1.0, // Độ rộng của biên
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    //onChanged: (value)=>_runFilter(value),
-                    decoration: InputDecoration(
-                      contentPadding:
-                      EdgeInsets.only(top: -2, left: 13, right: 0),
-                      border: InputBorder.none,
-                      hintText: "End time",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.watch_later_outlined,
-                        color: Colors.black54,
-                        size: 20,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
+          TimeRangeSelector(),
           Container(
             margin: EdgeInsets.only(top: 10, bottom: 0),
             child: Wrap(

@@ -1,4 +1,5 @@
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
+import 'package:advanced_mobileapp_development/presentation/DetailCourse/DetailCourse.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/DetailTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home: DetailTutor());
+        home: DetailCourse());
   }
 }
 

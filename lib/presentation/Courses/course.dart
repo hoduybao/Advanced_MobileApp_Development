@@ -60,13 +60,28 @@ class _CourseState extends State<Course> {
                   children: [
                     Text(widget.title,style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 20
                     ),),
                     SizedBox(height: 5,),
                     Text(widget.description,style: TextStyle(
                       color: Colors.grey
                     ),),
                     SizedBox(height: 15,),
+                    widget.type=="DetailCourse"? Container(
+                      width: double.infinity,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blueAccent.shade700,
+
+                      ),
+
+                      child: TextButton(onPressed: (){}, child: Text(
+                        "Discover",style: TextStyle(
+                        color: Colors.white
+                      ),
+                      )),
+                    ) :
                     Row(
                       children: [
                         Text(widget.level),

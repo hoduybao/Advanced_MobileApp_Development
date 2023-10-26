@@ -23,7 +23,7 @@ class _DetailTutorState extends State<DetailTutor> {
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
-              const Size.fromHeight(60.0), // Define the height of the AppBar
+              const Size.fromHeight(50.0), // Define the height of the AppBar
           child: Container(
             decoration: BoxDecoration(color: Colors.blueAccent, boxShadow: [
               BoxShadow(
@@ -49,10 +49,15 @@ class _DetailTutorState extends State<DetailTutor> {
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   )),
-              leading: Icon(
-                Icons.arrow_back_ios,
-                size: 18,
-                color: Colors.blueAccent,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  size: 18,
+                  color: Colors.blueAccent,
+                ),
               ),
               centerTitle: true,
             ),

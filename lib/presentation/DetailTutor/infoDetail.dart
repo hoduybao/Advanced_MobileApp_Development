@@ -1,4 +1,6 @@
+import 'package:advanced_mobileapp_development/presentation/DetailCourse/DetailCourse.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 
@@ -60,9 +62,15 @@ class InfoDetail extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: Colors.black
                 ),
-                children: const <TextSpan>[
-                  TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal)),
-
+                children: [
+                  TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal),
+                      recognizer: TapGestureRecognizer()
+                  ..onTap=(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetailCourse()),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -78,9 +86,15 @@ class InfoDetail extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.black
                 ),
-                children: const <TextSpan>[
-                  TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal)),
-
+                children: [
+                  TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap=(){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => DetailCourse()),
+                          );
+                        }),
                 ],
               ),
             ),

@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/presentation/DetailTutor/DetailTutor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -75,19 +76,27 @@ class _TutorState extends State<Tutor> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 65, // Đặt chiều rộng của container
-                    height: 65, // Đặt chiều cao của container
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle, // Đặt hình dạng là hình tròn
-                      border: Border.all(
-                        color: Colors.blue, // Màu của đường viền
-                        width: 1, // Độ rộng của đường viền
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DetailTutor()),
+                      );
+                    },
+                    child: Container(
+                      width: 65, // Đặt chiều rộng của container
+                      height: 65, // Đặt chiều cao của container
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle, // Đặt hình dạng là hình tròn
+                        border: Border.all(
+                          color: Colors.blue, // Màu của đường viền
+                          width: 1, // Độ rộng của đường viền
+                        ),
                       ),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                          'images/welcome_login.png'), // Thay thế bằng hình ảnh của bạn
+                      child: ClipOval(
+                        child: Image.asset(
+                            'images/welcome_login.png'), // Thay thế bằng hình ảnh của bạn
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -96,10 +105,18 @@ class _TutorState extends State<Tutor> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Keegan",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 20),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => DetailTutor()),
+                          );
+                        },
+                        child: Text(
+                          "Keegan",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 20),
+                        ),
                       ),
                       Row(
                         children: [

@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/presentation/DetailLesson/DetailLesson.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +77,12 @@ class _CourseState extends State<Course> {
 
                       ),
 
-                      child: TextButton(onPressed: (){}, child: Text(
+                      child: TextButton(onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DetailLesson()),
+                        );
+                      }, child: Text(
                         "Discover",style: TextStyle(
                         color: Colors.white
                       ),

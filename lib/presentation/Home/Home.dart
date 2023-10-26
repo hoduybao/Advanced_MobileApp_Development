@@ -27,6 +27,7 @@ class Home extends StatelessWidget {
               ],
             ),
             child: AppBar(
+              automaticallyImplyLeading: false,
                 systemOverlayStyle: const SystemUiOverlayStyle(
                   // Status bar color
                   statusBarColor: Colors.black,

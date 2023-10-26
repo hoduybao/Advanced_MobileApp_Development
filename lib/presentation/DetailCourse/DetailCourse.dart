@@ -50,10 +50,15 @@ class _DetailCourseState extends State<DetailCourse> {
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   )),
-              leading: Icon(
-                Icons.arrow_back_ios,
-                size: 18,
-                color: Colors.blueAccent,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  size: 18,
+                  color: Colors.blueAccent,
+                ),
               ),
               centerTitle: true,
             ),

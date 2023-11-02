@@ -1,6 +1,7 @@
 import 'package:advanced_mobileapp_development/presentation/Home/timeRange.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multiselect/multiselect.dart';
+import 'package:get/get.dart';
 
 class SearchTutor extends StatefulWidget {
   const SearchTutor({super.key});
@@ -8,6 +9,7 @@ class SearchTutor extends StatefulWidget {
   @override
   State<SearchTutor> createState() => _SearchTutorState();
 }
+
 List<Widget> generateWidgets(List<String> list) {
   List<Widget> widgets = [];
   Color backgroundColor = Color.fromARGB(255, 232, 232, 232);
@@ -40,8 +42,16 @@ List<Widget> generateWidgets(List<String> list) {
 class _SearchTutorState extends State<SearchTutor> {
   DateTime selectDate = DateTime.now();
   TextEditingController _textEditingDate = TextEditingController();
+  List<String> _items = [
+    "Foreign Tutor",
+    "Vietnamese Tutor",
+    "Native English Tutor"
+  ];
+  List<String> selectedOptionList = [];
+  var selectedOption = ''.obs;
   @override
   Widget build(BuildContext context) {
+
     List<String> listFilters = [
       "All",
       "English for kids",
@@ -75,70 +85,59 @@ class _SearchTutorState extends State<SearchTutor> {
           SizedBox(
             height: 15,
           ),
-          Row(
-            children: [
-              Expanded(
-                flex: 4,
-                child: Container(
-                  height: 40,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey, // Màu của biên
-                      width: 1.0, // Độ rộng của biên
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    //onChanged: (value)=>_runFilter(value),
-                    decoration: InputDecoration(
-                        contentPadding:
-                        EdgeInsets.only(top: -12, left: 5, right: 2),
-                        border: InputBorder.none,
-                        hintText: "Enter tutor name...",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400)),
-                    style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16),
+          Container(
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey, // Màu của biên
+                width: 1.0, // Độ rộng của biên
+              ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: TextField(
+              //onChanged: (value)=>_runFilter(value),
+              decoration: InputDecoration(
+                  contentPadding: EdgeInsets.only(top: -12, left: 5, right: 2),
+                  border: InputBorder.none,
+                  hintText: "Enter tutor name...",
+                  hintStyle: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.w400)),
+              style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            height: 40,
+            child: DropDownMultiSelect(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 15,right: 15),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20), // Set the border radius
+                  borderSide: BorderSide(
+                    color: Colors.grey, // Set the border color
+                    width: 1.0, // Set the border width
                   ),
                 ),
               ),
-              SizedBox(
-                width: 5,
-              ),
-              Expanded(
-                flex: 3,
-                child: Container(
-                  height: 40,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey, // Màu của biên
-                      width: 1.0, // Độ rộng của biên
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    //onChanged: (value)=>_runFilter(value),
-                    decoration: InputDecoration(
-                        contentPadding:
-                        EdgeInsets.only(top: -12, left: 5, right: 2),
-                        border: InputBorder.none,
-                        hintText: "Select tutor nation",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400)),
-                    style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16),
-                  ),
-                ),
-              )
-            ],
+              options: _items,
+              whenEmpty: "Select tutor nationality",
+              onChanged: (value) {
+                selectedOptionList = value;
+                selectedOption.value = "";
+                selectedOptionList.forEach((element) {
+                  selectedOption.value = selectedOption.value + ", " + element;
+                });
+              },
+              selectedValues: selectedOptionList,
+            ),
+
           ),
           SizedBox(
             height: 10,
@@ -177,7 +176,7 @@ class _SearchTutorState extends State<SearchTutor> {
                 if (datetime != null) {
                   setState(() {
                     _textEditingDate.text =
-                    "${datetime.year}-${datetime.month}-${datetime.day}";
+                        "${datetime.year}-${datetime.month}-${datetime.day}";
                     selectDate = datetime;
                   });
                 }

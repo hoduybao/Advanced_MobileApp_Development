@@ -24,7 +24,7 @@ class _DetailCourseState extends State<DetailCourse> {
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
-              const Size.fromHeight(60.0), // Define the height of the AppBar
+              const Size.fromHeight(50.0), // Define the height of the AppBar
           child: Container(
             decoration: BoxDecoration(color: Colors.blueAccent, boxShadow: [
               BoxShadow(

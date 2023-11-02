@@ -1,8 +1,12 @@
+import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../Courses/Courses.dart';
+import '../Schedule/Schedule.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -10,9 +14,122 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        endDrawer: Drawer(
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                height: 125,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      border: null
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            child: Icon(Icons.close_outlined,color: Colors.white,),
+                            onTap: (){
+                              Navigator.of(context).pop();
+                            },),
+                          Text("Menu",style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500
+                          ),),
+                          Text("",textAlign: TextAlign.center,),
+
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+
+              ListTile(
+                leading: Icon(Icons.people_alt,color: Colors.blue.shade700,size: 30,),
+                title: const Text('Tutors',style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 17
+                ),),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>Home()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.school,color: Colors.blue.shade700,size: 30,),
+                title: const Text('Courses',style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 17
+                ),),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Courses()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.calendar_month,color: Colors.blue.shade700,size: 30,),
+                title: const Text('Schedule',style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 17
+                ),),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Schedule()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.history,color: Colors.blue.shade700,size: 30,),
+                title: const Text('History',style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 17
+                ),),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => History()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.logout,color: Colors.blue.shade700,size: 30,),
+                title: const Text('Logout',style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 17
+                )),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+            ],
+          ),
+        ),
         appBar: PreferredSize(
           preferredSize:
-          const Size.fromHeight(60.0), // Define the height of the AppBar
+          const Size.fromHeight(50.0), // Define the height of the AppBar
           child: Container(
             decoration: BoxDecoration(
               boxShadow: [
@@ -26,6 +143,7 @@ class History extends StatelessWidget {
               ],
             ),
             child: AppBar(
+              automaticallyImplyLeading: false,
                 systemOverlayStyle: const SystemUiOverlayStyle(
                   // Status bar color
                   statusBarColor: Colors.black,
@@ -34,7 +152,7 @@ class History extends StatelessWidget {
                   Brightness.light, // For Android (dark icons)
                 ),
                 title: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -51,10 +169,6 @@ class History extends StatelessWidget {
                               fontWeight: FontWeight.w500),
                         ),
                       ],
-                    ),
-                    Icon(
-                      Icons.menu,
-                      size: 30,
                     ),
                   ],
                 )

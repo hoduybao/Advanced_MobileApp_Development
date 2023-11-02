@@ -32,7 +32,6 @@ class _ListCourseState extends State<ListCourse> {
                 shrinkWrap: true,
                 children:[
                   Course(type: "Course",image: "images/AvatarCourse.png",title: "Life in the Internet Age",description: "Let's discuss how technology is changing the way we live",level: "Intermediate",numberLesson: "9",),
-
                   Course(type: "Course",image: "images/AvatarCourse.png",title: "Life in the Internet Age",description: "Let's discuss how technology is changing the way we live",level: "Intermediate",numberLesson: "9",),
                   Course(type: "Course",image: "images/AvatarCourse.png",title: "Life in the Internet Age",description: "Let's discuss how technology is changing the way we live",level: "Intermediate",numberLesson: "9",),
                 ]

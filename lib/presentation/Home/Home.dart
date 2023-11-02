@@ -2,6 +2,7 @@ import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
+import 'package:advanced_mobileapp_development/presentation/VideoCall/VideoCallPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -256,7 +257,12 @@ class UpcomingLesson extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => VideoCallPage()),
+                      );
+                    },
                     child: Row(
                       children: [
                         Icon(

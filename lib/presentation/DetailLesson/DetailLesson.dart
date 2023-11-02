@@ -71,11 +71,7 @@ class _DetailLessonState extends State<DetailLesson> {
         ),
         body: SingleChildScrollView(
             child: Container(
-                padding:
-                    EdgeInsets.only(left: 10, right: 10, bottom: 20, top: 0),
-                child: Container(
-                  margin: EdgeInsets.only(top: 20),
-                  padding: EdgeInsets.only(bottom: 15),
+                  padding: EdgeInsets.only(bottom: 35,left: 10,right: 10,top: 20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(
@@ -148,21 +144,19 @@ class _DetailLessonState extends State<DetailLesson> {
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(top: 5),
-                                    padding: EdgeInsets.only(left: 20),
+                                    padding: EdgeInsets.only(left: 20,top: 10),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
                                       color: selectedItemIndex == index
                                           ? Colors.grey.shade300
                                           : Colors.white,
                                     ),
-                                    height: 37,
-                                    child: Row(
-                                      children: [
+                                    height: 40,
+                                    child:
                                         Text((index + 1).toString() +
                                             ".    " +
                                             topics[index])
-                                      ],
-                                    ),
+
                                   ),
                                 );
                               },
@@ -174,6 +168,6 @@ class _DetailLessonState extends State<DetailLesson> {
                       )
                     ],
                   ),
-                ))));
+                )));
   }
 }

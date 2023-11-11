@@ -1,15 +1,11 @@
-import 'package:advanced_mobileapp_development/presentation/Register/Register.dart';
-import 'package:flutter/material.dart';
+import 'package:advanced_mobileapp_development/presentation/Login/Login.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:toastification/toastification.dart';
+import 'formRegister.dart';
 
-import '../../main.dart';
-import 'formLogin.dart';
-
-class Login extends StatelessWidget {
-  Login(this.callback);
-  final LoginCallback callback;
+class Register extends StatelessWidget {
+  const Register({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +84,7 @@ class Login extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              FormLogin(callback),
+              FormLogin(),
               Container(
                   margin: EdgeInsets.only(top: 30),
                   child: Text("Or continue with")),
@@ -128,42 +124,16 @@ class OrtherLogin extends StatelessWidget {
             margin: EdgeInsets.only(top: 25, bottom: 50),
             child: RichText(
               text: TextSpan(
-                text: 'Not a member yet? ',
+                text: 'Already have an account? ',
                 style: DefaultTextStyle.of(context).style,
                 children: [
                   TextSpan(
-                    text: 'Sign up',
-                    style: TextStyle(color: Colors.blueAccent),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
+                      text: 'Log in',
+                      style: TextStyle(color: Colors.blueAccent),
+                     recognizer: TapGestureRecognizer()..onTap = ()  {
                         // Chuyển đến trang đăng ký khi nhấn vào "Sign up"
-                        bool registered = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Register()),
-                        );
-                        if (registered != null && registered) {
-                          toastification.show(
-                            context: context,
-                            autoCloseDuration: const Duration(seconds: 3),
-                            title: 'Sign up successful!',
-                            description:
-                                'Please check your email to verify account.',
-                            animationDuration:
-                                const Duration(milliseconds: 300),
-                            icon: Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.green,
-                            ),
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 35),
-                            borderRadius: BorderRadius.circular(3),
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                          );
-                        }
+                       Navigator.pop(context);
+
                       },
                   ),
                 ],

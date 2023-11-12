@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/model/tutor-dto.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
@@ -5,13 +6,52 @@ import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.da
 import 'package:advanced_mobileapp_development/presentation/VideoCall/VideoCallPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../model/rate-dto.dart';
 import 'listTutors.dart';
 
-class Home extends StatelessWidget {
+typedef FilterCallback = void Function(String filter);
+
+class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<TutorDTO> tutorsFilter = [];
+  List<TutorDTO> tutors=[];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+    filterCallback("All");
+    });
+  }
+  void filterCallback(String filter) {
+    print(tutorsFilter.length);
+    if (filter == "All") {
+      setState(() {
+        tutorsFilter = tutors;
+      });
+    } else {
+      setState(() {
+        tutorsFilter = tutors
+            .where((tutor) => tutor.specialities.contains(filter))
+            .toList();
+      });
+    }
+
+  }
+  @override
   Widget build(BuildContext context) {
+    tutors = context.watch<List<TutorDTO>>();
+
+
+
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -199,7 +239,7 @@ class Home extends StatelessWidget {
           child: Container(
               child: Column(children: [
         UpcomingLesson(),
-        SearchTutor(),
+        SearchTutor(filterCallback),
         Divider(
           // Add a horizontal line
           color: Colors.grey, // Line color
@@ -208,7 +248,7 @@ class Home extends StatelessWidget {
           indent: 20, // Line indent on the left
           endIndent: 10, // Line indent on the right
         ),
-        ListTutors(),
+        ListTutors(tutorsFilter),
       ]))),
     );
   }

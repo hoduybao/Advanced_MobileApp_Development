@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:multiselect/multiselect.dart';
 import 'package:get/get.dart';
 
-class SearchTutor extends StatefulWidget {
-  const SearchTutor({super.key});
+import 'Home.dart';
 
+class SearchTutor extends StatefulWidget {
+  const SearchTutor(this.filterCallback,{super.key});
+  final FilterCallback filterCallback;
   @override
   State<SearchTutor> createState() => _SearchTutorState();
 }
@@ -49,6 +51,8 @@ class _SearchTutorState extends State<SearchTutor> {
   ];
   List<String> selectedOptionList = [];
   var selectedOption = ''.obs;
+  String selectedButton = 'All';
+
   @override
   Widget build(BuildContext context) {
 
@@ -206,8 +210,33 @@ class _SearchTutorState extends State<SearchTutor> {
           Container(
             margin: EdgeInsets.only(top: 10, bottom: 0),
             child: Wrap(
-              spacing: 5,
-              children: generatedWidgets,
+              spacing: 6,
+              runSpacing: -5,
+              children: List.generate(listFilters.length, (index) => TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedButton = listFilters[index];
+                    });
+                    widget.filterCallback(listFilters[index]);
+                  },
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(
+                        Size(40, 30)), // Thay đổi width và height tùy ý
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5)), // Điều chỉnh lề cho TextButton
+                    backgroundColor: selectedButton==listFilters[index]?MaterialStateProperty.all<Color>(Colors.blue.shade100):MaterialStateProperty.all<Color>(Color.fromRGBO(228, 230, 235, 1)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20), // Đặt góc bo tròn
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    listFilters[index],
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w400, color: selectedButton==listFilters[index]?Colors.blue.shade800:Color.fromRGBO(100, 100, 100, 1)),
+                  )))
+              //generatedWidgets,
             ),
           ),
           TextButton(

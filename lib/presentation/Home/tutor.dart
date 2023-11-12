@@ -1,9 +1,11 @@
+import 'package:advanced_mobileapp_development/model/tutor-dto.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/DetailTutor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Tutor extends StatefulWidget {
-  const Tutor({super.key});
+  const Tutor(this.tutor,{super.key});
+  final TutorDTO tutor;
 
   @override
   State<Tutor> createState() => _TutorState();
@@ -39,18 +41,35 @@ List<Widget> generateWidgets(List<String> list) {
 
   return widgets;
 }
+List<Widget> generateRatings(int rating) {
+  List<Widget> widgets = [];
+
+  for (int i = 1; i <=5; i++) {
+    if(i<=rating) {
+      widgets.add(const Icon(
+        Icons.star,
+        size: 15,
+        color: Colors.yellow,
+      ));
+    }
+    else{
+      widgets.add(Icon(
+        Icons.star,
+        size: 14,
+        color: Colors.grey.shade300,
+      ));
+      // Thêm widget Text vào danh sách
+    }
+  }
+
+  return widgets;
+}
 
 class _TutorState extends State<Tutor> {
   @override
   Widget build(BuildContext context) {
-    List<String> listFilters = [
-      "English for kids",
-      "English for Business",
-      "Conversational",
-      "STARTERS",
-      "IELTS",
-    ];
-    List<Widget> generatedWidgets = generateWidgets(listFilters);
+    bool isFavorite=false;
+    List<Widget> generatedWidgets = generateWidgets(widget.tutor.specialities);
     return Container(
       padding: EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 15),
       decoration: BoxDecoration(
@@ -94,8 +113,8 @@ class _TutorState extends State<Tutor> {
                         ),
                       ),
                       child: ClipOval(
-                        child: Image.asset(
-                            'images/welcome_login.png'), // Thay thế bằng hình ảnh của bạn
+                        child: Image.network(
+                            widget.tutor.avatar), // Thay thế bằng hình ảnh của bạn
                       ),
                     ),
                   ),
@@ -113,15 +132,15 @@ class _TutorState extends State<Tutor> {
                           );
                         },
                         child: Text(
-                          "Keegan",
+                          widget.tutor.name,
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 20),
                         ),
                       ),
                       Row(
                         children: [
-                          SvgPicture.asset(
-                            'images/Tunisia.svg', // Replace with the path to your SVG file
+                          SvgPicture.network(
+                            widget.tutor.avatarCountry, // Replace with the path to your SVG file
                             width: 16, // Adjust the width as needed
                             height: 16, // Adjust the height as needed
                           ),
@@ -129,7 +148,7 @@ class _TutorState extends State<Tutor> {
                             width: 3,
                           ),
                           Text(
-                            "Tunisia",
+                            widget.tutor.country,
                             style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black54,
@@ -142,33 +161,7 @@ class _TutorState extends State<Tutor> {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.yellow,
-                          ),
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.yellow,
-                          ),
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.yellow,
-                          ),
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.yellow,
-                          ),
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.yellow,
-                          )
-                        ],
+                        children:generateRatings(widget.tutor.rating)
                       )
                     ],
                   )
@@ -190,8 +183,7 @@ class _TutorState extends State<Tutor> {
           ),
           Container(
             margin: EdgeInsets.only(top: 10,bottom: 20),
-            child: Text(
-                "I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.",
+            child: Text(widget.tutor.description,
                 maxLines: 4,
                 style: TextStyle(
                   fontSize: 12,

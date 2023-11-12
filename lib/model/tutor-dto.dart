@@ -1,21 +1,23 @@
 import 'package:advanced_mobileapp_development/model/rate-dto.dart';
 
-class Tutor{
-  String? name;
-  String? avatar;
-  String? country;
-  String? avatarCountry;
-  int? rating;
+class TutorDTO{
+  String id;
+  String name;
+  String avatar;
+  String country;
+  String avatarCountry;
+  int rating;
   List<String> specialities=[];
-  String? description;
-  String? linkVideoIntro;
-  String? education;
-  String? languages;
-  String? interests;
-  String? experience;
+  String description;
+  String linkVideoIntro;
+  String education;
+  String languages;
+  String interests;
+  String experience;
   List<Rate> ratings=[];
 
-  Tutor(
+  TutorDTO(
+      this.id,
       this.name,
       this.avatar,
       this.country,

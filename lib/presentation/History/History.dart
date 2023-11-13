@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/main.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/session.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,8 +10,8 @@ import '../Courses/Courses.dart';
 import '../Schedule/Schedule.dart';
 
 class History extends StatelessWidget {
-  const History({super.key});
-
+  const History(this.loginCallback,{super.key});
+   final LoginCallback loginCallback;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +71,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home()),
+                  MaterialPageRoute(builder: (context) => Home(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -89,7 +90,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses()),
+                  MaterialPageRoute(builder: (context) => Courses(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -108,7 +109,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule()),
+                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -127,7 +128,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History()),
+                  MaterialPageRoute(builder: (context) => History(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...

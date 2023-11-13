@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import 'Home.dart';
 
 class SearchTutor extends StatefulWidget {
-  const SearchTutor(this.filterCallback,{super.key});
+  const SearchTutor(this.filterCallback,this.findNameCallback,this.findNationCallback,{super.key});
   final FilterCallback filterCallback;
+  final FilterCallback findNameCallback;
+  final FilterNationCallback findNationCallback;
+
   @override
   State<SearchTutor> createState() => _SearchTutorState();
 }
@@ -44,6 +47,7 @@ List<Widget> generateWidgets(List<String> list) {
 class _SearchTutorState extends State<SearchTutor> {
   DateTime selectDate = DateTime.now();
   TextEditingController _textEditingDate = TextEditingController();
+
   List<String> _items = [
     "Foreign Tutor",
     "Vietnamese Tutor",
@@ -101,6 +105,9 @@ class _SearchTutorState extends State<SearchTutor> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: TextField(
+              onSubmitted: (value) {
+                widget.findNameCallback(value);
+              },
               //onChanged: (value)=>_runFilter(value),
               decoration: InputDecoration(
                   contentPadding: EdgeInsets.only(top: -12, left: 5, right: 2),
@@ -134,6 +141,9 @@ class _SearchTutorState extends State<SearchTutor> {
               whenEmpty: "Select tutor nationality",
               onChanged: (value) {
                 selectedOptionList = value;
+                if(!selectedOptionList.isEmpty) {
+                  widget.findNationCallback(value);
+                }
                 selectedOption.value = "";
                 selectedOptionList.forEach((element) {
                   selectedOption.value = selectedOption.value + ", " + element;

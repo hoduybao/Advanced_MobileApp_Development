@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../main.dart';
 import '../Schedule/Schedule.dart';
 import 'content.dart';
 
 class Courses extends StatelessWidget {
-  const Courses({super.key});
+  const Courses(this.loginCallback,{super.key});
+  final LoginCallback loginCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home()),
+                  MaterialPageRoute(builder: (context) => Home(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -90,7 +92,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses()),
+                  MaterialPageRoute(builder: (context) => Courses(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -109,7 +111,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule()),
+                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -128,7 +130,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History()),
+                  MaterialPageRoute(builder: (context) => History(loginCallback)),
                 );
                 // Update the state of the app.
                 // ...

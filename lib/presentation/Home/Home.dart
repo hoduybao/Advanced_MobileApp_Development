@@ -8,14 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../main.dart';
 import '../../model/rate-dto.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(String filter);
+typedef FilterNationCallback = void Function(List<String> name);
 
 class Home extends StatefulWidget {
-  const Home({super.key});
-
+  const Home(this.loginCallback,{super.key});
+  final LoginCallback loginCallback;
   @override
   State<Home> createState() => _HomeState();
 }
@@ -32,7 +34,6 @@ class _HomeState extends State<Home> {
     });
   }
   void filterCallback(String filter) {
-    print(tutorsFilter.length);
     if (filter == "All") {
       setState(() {
         tutorsFilter = tutors;
@@ -44,12 +45,49 @@ class _HomeState extends State<Home> {
             .toList();
       });
     }
-
   }
+  void findNationCallback(List<String> nation) {
+    List<TutorDTO> temp=[];
+    if(!nation.isEmpty)
+      {
+        nation.forEach((element) {
+          if (element=="Foreign Tutor") {
+
+            temp =temp+ tutors
+                .where((tutor) => !tutor.country.contains("US")&&!tutor.country.contains("England")&&!tutor.country.contains("Vietnam"))
+                .toList();
+
+          } else if(element=="Vietnamese Tutor"){
+            temp =temp+tutors
+                .where((tutor) => tutor.country.contains("Vietnam"))
+                .toList();
+          }
+          else if(element=="Native English Tutor")
+          {
+
+            temp = temp+tutors
+                .where((tutor) => tutor.country.contains("US")||tutor.country.contains("England"))
+                .toList();
+
+          }
+        });
+        setState(() {
+          tutorsFilter=temp;
+        });
+      }
+  }
+    void findNameCallback(String name) {
+
+        setState(() {
+          tutorsFilter = tutors
+              .where((tutor) => tutor.name.toLowerCase().contains(name.toLowerCase()))
+              .toList();
+        });
+
+    }
   @override
   Widget build(BuildContext context) {
     tutors = context.watch<List<TutorDTO>>();
-
 
 
     return Scaffold(
@@ -109,7 +147,7 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home()),
+                  MaterialPageRoute(builder: (context) => Home(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -128,7 +166,7 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses()),
+                  MaterialPageRoute(builder: (context) => Courses(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -147,7 +185,7 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule()),
+                  MaterialPageRoute(builder: (context) => Schedule(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -166,7 +204,7 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History()),
+                  MaterialPageRoute(builder: (context) => History(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -181,8 +219,7 @@ class _HomeState extends State<Home> {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                widget.loginCallback(0);
               },
             ),
           ],
@@ -239,7 +276,7 @@ class _HomeState extends State<Home> {
           child: Container(
               child: Column(children: [
         UpcomingLesson(),
-        SearchTutor(filterCallback),
+        SearchTutor(filterCallback,findNameCallback,findNationCallback),
         Divider(
           // Add a horizontal line
           color: Colors.grey, // Line color

@@ -6,7 +6,6 @@ import 'package:advanced_mobileapp_development/presentation/DetailTutor/videoInt
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:expandable_text/expandable_text.dart';
 
 class DetailCourse extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:advanced_mobileapp_development/model/tutor-dto.dart';
+import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
@@ -12,8 +12,7 @@ import '../../main.dart';
 import '../../model/rate-dto.dart';
 import 'listTutors.dart';
 
-typedef FilterCallback = void Function(String filter);
-typedef FilterNationCallback = void Function(List<String> name);
+typedef FilterCallback = void Function(String filter,String nameTutor,List<String> nation);
 
 class Home extends StatefulWidget {
   const Home(this.loginCallback,{super.key});
@@ -30,61 +29,56 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-    filterCallback("All");
+    filterCallback("All","",[]);
     });
   }
-  void filterCallback(String filter) {
-    if (filter == "All") {
-      setState(() {
-        tutorsFilter = tutors;
-      });
-    } else {
-      setState(() {
-        tutorsFilter = tutors
-            .where((tutor) => tutor.specialities.contains(filter))
-            .toList();
-      });
-    }
-  }
-  void findNationCallback(List<String> nation) {
+  void filterCallback(String filter,String nameTutor,List<String> nation) {
     List<TutorDTO> temp=[];
-    if(!nation.isEmpty)
-      {
-        nation.forEach((element) {
-          if (element=="Foreign Tutor") {
+    if (filter == "All") {
+        temp = tutors;
+    } else {
 
-            temp =temp+ tutors
-                .where((tutor) => !tutor.country.contains("US")&&!tutor.country.contains("England")&&!tutor.country.contains("Vietnam"))
-                .toList();
-
-          } else if(element=="Vietnamese Tutor"){
-            temp =temp+tutors
-                .where((tutor) => tutor.country.contains("Vietnam"))
-                .toList();
-          }
-          else if(element=="Native English Tutor")
-          {
-
-            temp = temp+tutors
-                .where((tutor) => tutor.country.contains("US")||tutor.country.contains("England"))
-                .toList();
-
-          }
-        });
-        setState(() {
-          tutorsFilter=temp;
-        });
-      }
-  }
-    void findNameCallback(String name) {
-
-        setState(() {
-          tutorsFilter = tutors
-              .where((tutor) => tutor.name.toLowerCase().contains(name.toLowerCase()))
-              .toList();
-        });
-
+        temp = tutors
+            .where((tutor) => tutor.specialties.contains(filter))
+            .toList();
     }
+
+    if(!nation.isEmpty)
+    {
+      List<TutorDTO> filterOfNation=[];
+      nation.forEach((element) {
+        if (element=="Foreign Tutor") {
+
+          filterOfNation =filterOfNation+temp
+              .where((tutor) => !tutor.country.contains("US")&&!tutor.country.contains("England")&&!tutor.country.contains("Vietnam"))
+              .toList();
+
+        } else if(element=="Vietnamese Tutor"){
+          filterOfNation =filterOfNation+temp
+              .where((tutor) => tutor.country.contains("Vietnam"))
+              .toList();
+        }
+        else if(element=="Native English Tutor")
+        {
+
+          filterOfNation =filterOfNation+temp
+              .where((tutor) => tutor.country.contains("US")||tutor.country.contains("England"))
+              .toList();
+
+        }
+      });
+      temp=filterOfNation;
+    }
+    temp = temp
+        .where((tutor) => tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
+        .toList();
+
+    setState(() {
+      tutorsFilter=temp;
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     tutors = context.watch<List<TutorDTO>>();
@@ -276,7 +270,7 @@ class _HomeState extends State<Home> {
           child: Container(
               child: Column(children: [
         UpcomingLesson(),
-        SearchTutor(filterCallback,findNameCallback,findNationCallback),
+        SearchTutor(filterCallback),
         Divider(
           // Add a horizontal line
           color: Colors.grey, // Line color

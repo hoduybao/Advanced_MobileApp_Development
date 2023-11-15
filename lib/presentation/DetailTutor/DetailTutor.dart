@@ -1,16 +1,23 @@
+import 'dart:convert';
+
+import 'package:advanced_mobileapp_development/model/tutor.dart';
+import 'package:advanced_mobileapp_development/presentation/DetailTutor/booking.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/infoDetail.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/listReview.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/videoIntro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:expandable_text/expandable_text.dart';
+import 'package:provider/provider.dart';
+
+import '../../model/schedule-dto.dart';
+import '../../repository/favorite-repository.dart';
 
 
 class DetailTutor extends StatefulWidget {
-  const DetailTutor({super.key});
-
+  const DetailTutor(this.tutor,{super.key});
+  final TutorDTO tutor;
   @override
   State<DetailTutor> createState() => _DetailTutorState();
 }
@@ -18,8 +25,35 @@ class DetailTutor extends StatefulWidget {
 class _DetailTutorState extends State<DetailTutor> {
   bool isFavorite=false;
 
+  List<Widget> generateRatings(double rating) {
+    int realRating=rating.toInt();
+    List<Widget> widgets = [];
+
+    for (int i = 1; i <=5; i++) {
+      if(i<=realRating) {
+        widgets.add(const Icon(
+          Icons.star,
+          size: 20,
+          color: Colors.yellow,
+        ));
+      }
+      else{
+        widgets.add(Icon(
+          Icons.star,
+          size: 20,
+          color: Colors.grey.shade300,
+        ));
+        // Thêm widget Text vào danh sách
+      }
+    }
+
+    return widgets;
+  }
+
   @override
   Widget build(BuildContext context) {
+    FavouriteRepository favouriteRepository = context.watch<FavouriteRepository>();
+    var isInFavourite = favouriteRepository.itemIds.contains(widget.tutor.userId);
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
@@ -67,6 +101,7 @@ class _DetailTutorState extends State<DetailTutor> {
         ),
         body: SingleChildScrollView(
             child: Container(
+
                 padding: EdgeInsets.all(25),
                 child: Column(children: [
                   Row(
@@ -82,8 +117,8 @@ class _DetailTutorState extends State<DetailTutor> {
                           ),
                         ),
                         child: ClipOval(
-                          child: Image.asset(
-                              'images/welcome_login.png'), // Thay thế bằng hình ảnh của bạn
+                          child: Image.network(
+                              widget.tutor.avatar,), // Thay thế bằng hình ảnh của bạn
                         ),
                       ),
                       SizedBox(
@@ -94,7 +129,7 @@ class _DetailTutorState extends State<DetailTutor> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            "Keegan",
+                            widget.tutor.name,
                             style: TextStyle(
                                 fontWeight: FontWeight.w500, fontSize: 22),
                           ),
@@ -103,45 +138,15 @@ class _DetailTutorState extends State<DetailTutor> {
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.star,
-                                size: 20,
-                                color: Colors.yellow,
-                              ),
-                              Icon(
-                                Icons.star,
-                                size: 20,
-                                color: Colors.yellow,
-                              ),
-                              Icon(
-                                Icons.star,
-                                size: 20,
-                                color: Colors.yellow,
-                              ),
-                              Icon(
-                                Icons.star,
-                                size: 20,
-                                color: Colors.yellow,
-                              ),
-                              Icon(
-                                Icons.star,
-                                size: 20,
-                                color: Colors.grey.shade300,
-                              ),
-                              Text(
-                                "(127)",
-                                style: TextStyle(color: Colors.grey.shade700),
-                              )
-                            ],
+                            children: generateRatings(widget.tutor.rating!=null?widget.tutor.rating:0.0)
                           ),
                           SizedBox(
                             height: 10,
                           ),
                           Row(
                             children: [
-                              SvgPicture.asset(
-                                'images/Tunisia.svg', // Replace with the path to your SVG file
+                              SvgPicture.network("https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.3/flags/4x3/"+
+                                widget.tutor.country.toString().toLowerCase()+".svg", // Replace with the path to your SVG file
                                 width: 16, // Adjust the width as needed
                                 height: 16, // Adjust the height as needed
                               ),
@@ -149,7 +154,7 @@ class _DetailTutorState extends State<DetailTutor> {
                                 width: 3,
                               ),
                               Text(
-                                "Tunisia",
+                                widget.tutor.country,
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black54,
@@ -166,7 +171,7 @@ class _DetailTutorState extends State<DetailTutor> {
                   ),
 
                   ExpandableText(
-                      "I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.",
+                    widget.tutor.bio,
                       expandText: 'More',
                       collapseText: 'Less',
                       maxLines:
@@ -185,19 +190,17 @@ class _DetailTutorState extends State<DetailTutor> {
                         children: [
                           IconButton(
                               onPressed: () {
-                                setState(() {
-                                  isFavorite=!isFavorite;
-                                });
+                                isInFavourite?favouriteRepository.remove(widget.tutor.userId):favouriteRepository.add(widget.tutor.userId);
+
                               },
                               icon: Icon(
-                                isFavorite?
-                                Icons.favorite:Icons.favorite_border_outlined,
-                                color:isFavorite?Colors.red :  Colors.blueAccent,
+                                isInFavourite?Icons.favorite:Icons.favorite_border,
+                                color: isInFavourite?Colors.red:Colors.blueAccent,
                                 size: 25,
                               )),
                           Text(
                             "Favorite",
-                            style: TextStyle(color:isFavorite?Colors.red: Colors.blueAccent),
+                            style: TextStyle(color:isInFavourite?Colors.red: Colors.blueAccent),
                           )
                         ],
                       ),
@@ -223,12 +226,12 @@ class _DetailTutorState extends State<DetailTutor> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  VideoIntro(),
-                  InfoDetail(),
+                  ChewieDemo(linkVideo: widget.tutor.video,),
+                  InfoDetail(widget.tutor),
                   SizedBox(height: 20),
-                  ListReview()
-
-
+                  ListReview(widget.tutor.feedbacks),
+                  SizedBox(height: 20),
+                  Booking()
                 ]))));
   }
 }

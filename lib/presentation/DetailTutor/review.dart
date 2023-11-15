@@ -1,15 +1,14 @@
+import 'package:advanced_mobileapp_development/model/feedback-dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class Review extends StatelessWidget {
-  final String avatar;
-  final String username;
-  final String time;
-  final int rating;
-  final String comment;
-  const Review({super.key, required this.avatar, required this.username, required this.time, required this.rating, required this.comment});
+import '../../model/rate-dto.dart';
 
+class Review extends StatelessWidget {
+
+  const Review(this.rate,{super.key});
+  final FeedbackDTO rate;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +18,6 @@ class Review extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 50, // Đặt chiều rộng của container
-            height: 50, // Đặt chiều cao của container
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -29,8 +26,8 @@ class Review extends StatelessWidget {
               ),// Đặt hình dạng là hình tròn
             ),
             child: ClipOval(
-              child: Image.asset(
-                  avatar), // Thay thế bằng hình ảnh của bạn
+              child: Image.network(
+                  rate.firstInfo.avatar,width: 50,height: 50,), // Thay thế bằng hình ảnh của bạn
             ),
           ),
           SizedBox(
@@ -42,11 +39,11 @@ class Review extends StatelessWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: username,
+                    text: rate.firstInfo.name,
                     style: TextStyle(
                         color: Colors.grey.shade600, fontSize: 16,fontWeight: FontWeight.normal),
                     children:  <TextSpan>[
-                      TextSpan(text:"   "+  time, style: TextStyle(color: Colors.grey.shade400)),
+                      TextSpan(text:"   "+  rate.updatedAt, style: TextStyle(color: Colors.grey.shade400)),
 
                     ],
                   ),
@@ -54,11 +51,11 @@ class Review extends StatelessWidget {
                 SizedBox(height: 5,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: generateWidgets(rating),
+                  children: generateWidgets(rate.rating),
                 ),
                 SizedBox(height: 2,),
 
-                Text(comment)
+                Text(rate.content)
               ],
             ),
         ],

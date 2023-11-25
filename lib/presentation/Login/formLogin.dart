@@ -56,8 +56,7 @@ class _FormLoginState extends State<FormLogin> {
                     isTypeEmail = false;
                     errorEmail = "Please input your Email!";
                   });
-                } else if (!RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                } else if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value)) {
                   setState(() {
                     isTypeEmail = false;

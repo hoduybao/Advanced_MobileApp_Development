@@ -4,7 +4,9 @@ import 'package:advanced_mobileapp_development/presentation/Schedule/session.dar
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../../repository/schedule-student-repository.dart';
 import '../Courses/Courses.dart';
 import '../Home/Home.dart';
 
@@ -13,6 +15,8 @@ class Schedule extends StatelessWidget {
   final LoginCallback loginCallback;
   @override
   Widget build(BuildContext context) {
+    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
+
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -243,13 +247,8 @@ class Schedule extends StatelessWidget {
             ListView(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              children: [
-                Session(typeSession: "Schedule", time_or_number: '1 lesson'),
-                Session(
-                  typeSession: "Schedule",
-                  time_or_number: "1 lesson",
-                ),
-              ],
+              children: mySchedule.mySchedule.length!=0?[Session(typeSession: "Schedule", schedule:mySchedule.mySchedule[0])]
+            :[],
             ),
           ]),
         ),

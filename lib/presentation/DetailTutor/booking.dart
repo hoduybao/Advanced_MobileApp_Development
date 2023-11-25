@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:intl/intl.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/booking_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../model/schedule-dto.dart';
@@ -31,22 +33,21 @@ class _BookingState extends State<Booking> {
     if (jsonData['data'] != null && jsonData['data'] is List) {
       schedules = List<Map<String, dynamic>>.from(jsonData["data"]);
     }
-
+    print(schedules.length);
     // Chuyển đổi thành danh sách các đối tượng Tutor'
     setState(() {
       listScheduleOfTutor = schedules.map((json) => ScheduleDTO.fromJson(json)).toList();
     });
-    for (var schedule in schedules) {
 
-      int secondId = schedule["startTimestamp"];
-      print(secondId);
-    }
 
   }
   @override
 
   @override
   Widget build(BuildContext context) {
+
+    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
+
     List<TimeRegion> _getTimeRegions() {
       final List<TimeRegion> regions = <TimeRegion>[];
 
@@ -136,6 +137,7 @@ class _BookingState extends State<Booking> {
 
                   if(dialogResult)
                     {
+                      mySchedule.addSchedule(listScheduleOfTutor[i]);
                       setState(() {
                         listScheduleOfTutor[i].booking();
                       });

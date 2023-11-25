@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:advanced_mobileapp_development/presentation/Courses/filter.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
@@ -10,12 +12,56 @@ import '../../main.dart';
 import '../Schedule/Schedule.dart';
 import 'content.dart';
 
-class Courses extends StatelessWidget {
+class Courses extends StatefulWidget {
   const Courses(this.loginCallback,{super.key});
   final LoginCallback loginCallback;
 
   @override
+  State<Courses> createState() => _CoursesState();
+}
+
+class _CoursesState extends State<Courses> {
+  List<Courses> listCourse=[];
+  void initState() {
+    // TODO: implement initState
+    loadCourse();
+  }
+  Future<void> loadCourse() async {
+    // Đọc dữ liệu từ file JSON
+    String jsonString = await rootBundle.loadString('assets/data/course.json');
+    Map<String, dynamic> jsonData = json.decode(jsonString);
+
+    // Lấy danh sách tutors từ dữ liệu JSON
+    List<Map<String, dynamic>> courseList = [];
+
+    if (jsonData['data'] != null && jsonData['data']['rows'] is List) {
+      courseList = List<Map<String, dynamic>>.from(jsonData['data']['rows']);
+    }
+
+    // Chuyển đổi thành danh sách các đối tượng Tutor'
+    listCourse = courseList.map((json) => TutorDTO.fromJson(json)).toList();
+
+    if(jsonData['tutors'] != null && jsonData['favoriteTutor'] is List)
+    {
+      favoriteList = List<Map<String, dynamic>>.from(jsonData['favoriteTutor']);
+    }
+    List<String> idindex = [];
+
+    for (var tutor in favoriteList) {
+      String secondId = tutor['secondId'];
+      idindex.add(secondId);
+    }
+
+    setState(() {
+      favouriteRepository.setListIds(idindex);
+    });
+
+
+
+  }
+  @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -73,7 +119,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Home(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -92,7 +138,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Courses(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -111,7 +157,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Schedule(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -130,7 +176,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History(loginCallback)),
+                  MaterialPageRoute(builder: (context) => History(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -147,7 +193,7 @@ class Courses extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Schedule(widget.loginCallback)),
                 );
               },
             ),

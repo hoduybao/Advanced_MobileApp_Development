@@ -1,3 +1,5 @@
+import 'package:advanced_mobileapp_development/model/booking-info-dto.dart';
+
 class ScheduleDetails {
   final int startPeriodTimestamp;
   final int endPeriodTimestamp;
@@ -7,7 +9,7 @@ class ScheduleDetails {
   final String endPeriod;
   final String createdAt;
   final String updatedAt;
-  final List<dynamic> bookingInfo; // Bạn cần thay đổi kiểu dữ liệu tùy thuộc vào dữ liệu thực tế
+  final List<BookingInforDTO> bookingInfo; // Bạn cần thay đổi kiểu dữ liệu tùy thuộc vào dữ liệu thực tế
   final bool isBooked;
 
   ScheduleDetails({
@@ -24,6 +26,12 @@ class ScheduleDetails {
   });
 
   factory ScheduleDetails.fromJson(Map<String, dynamic> json) {
+    List<BookingInforDTO> booking_infor = [];
+    if (json['bookingInfo'] != null) {
+      booking_infor = (json['bookingInfo'] as List)
+          .map((info) => BookingInforDTO.fromJson(info))
+          .toList();
+    }
     return ScheduleDetails(
       startPeriodTimestamp: json['startPeriodTimestamp'] as int,
       endPeriodTimestamp: json['endPeriodTimestamp'] as int,
@@ -33,7 +41,7 @@ class ScheduleDetails {
       endPeriod: json['endPeriod'] as String,
       createdAt: json['createdAt'] as String,
       updatedAt: json['updatedAt'] as String,
-      bookingInfo: json['bookingInfo'] as List<dynamic>,
+      bookingInfo: booking_infor,
       isBooked: json['isBooked'] as bool,
     );
   }

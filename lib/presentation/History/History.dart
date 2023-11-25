@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
+import '../../repository/schedule-student-repository.dart';
 import '../Courses/Courses.dart';
 import '../Schedule/Schedule.dart';
 
@@ -14,6 +16,8 @@ class History extends StatelessWidget {
    final LoginCallback loginCallback;
   @override
   Widget build(BuildContext context) {
+    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
+
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -245,13 +249,9 @@ class History extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 Session(
-                  typeSession: "History",
-                  time_or_number: "6 hours ago",
+                  typeSession: "History", schedule:mySchedule.mySchedule[0]
                 ),
-                Session(
-                  typeSession: "History",
-                  time_or_number: "6 hours ago",
-                ),
+
               ],
             ),
           ]),

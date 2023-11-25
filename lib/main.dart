@@ -9,12 +9,11 @@ import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Login/Login.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
 import 'package:advanced_mobileapp_development/repository/favorite-repository.dart';
+import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
-
-import 'model/schedule-dto.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,7 +30,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Account account = Account(email: "", password: "");
   List<TutorDTO> listTutor=[];
+  final  mySchedule=new MyScheduleChangeNotifier();
   final favouriteRepository = new FavouriteRepository();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -94,7 +95,8 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => account),
         Provider(create: (context)=>listTutor),
-        ChangeNotifierProvider(create: (context) => favouriteRepository)
+        ChangeNotifierProvider(create: (context) => favouriteRepository),
+        ChangeNotifierProvider(create: (context)=> mySchedule),
       ],
       child: MaterialApp(
           title: 'LetTutor',

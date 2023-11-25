@@ -33,8 +33,9 @@ class ScheduleDTO extends ChangeNotifier {
   factory ScheduleDTO.fromJson(Map<String, dynamic> json) {
     List<ScheduleDetails> scheduleDetails = [];
     if (json['scheduleDetails'] != null) {
-      scheduleDetails = List<ScheduleDetails>.from(json['scheduleDetails'].map(
-              (schedule) => ScheduleDetails.fromJson(schedule as Map<String, dynamic>)));
+      scheduleDetails = (json['scheduleDetails'] as List)
+          .map((detail) => ScheduleDetails.fromJson(detail))
+          .toList();
     }
 
     return ScheduleDTO(

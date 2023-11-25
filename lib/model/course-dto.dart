@@ -1,5 +1,6 @@
 import 'package:advanced_mobileapp_development/model/topic-dto.dart';
-import 'package:flutter/foundation.dart';
+
+import 'category-course-dto.dart';
 
 class CourseDTO {
   String id;
@@ -12,7 +13,12 @@ class CourseDTO {
   String otherDetails;
   int defaultPrice;
   int coursePrice;
-  // Add other properties as needed
+  final dynamic courseType;
+  final dynamic sectionType;
+  final dynamic visible;
+  final dynamic displayOrder;
+  String createdAt;
+  String updatedAt;
 
   List<Topic> topics;
   List<Category> categories;
@@ -28,9 +34,30 @@ class CourseDTO {
     required this.otherDetails,
     required this.defaultPrice,
     required this.coursePrice,
+    required this.courseType,
+    required this.sectionType,
+    required this.visible,
+    required this.displayOrder,
+    required this.createdAt,
+    required this.updatedAt,
     required this.topics,
     required this.categories,
   });
+  static String convertLevelToString(String level) {
+    String result="";
+
+    // Một mapping giữa các từ khóa trong chuỗi và nhãn tương ứng
+    Map<String, String> keywordToLabel = {
+      '0': 'Any Level',
+      '1': 'Beginner',
+       '4':'Intermediate',
+
+    };
+
+    result=keywordToLabel[level] ?? level;
+
+     return result;
+  }
 
   factory CourseDTO.fromJson(Map<String, dynamic> json) {
     return CourseDTO(
@@ -38,12 +65,20 @@ class CourseDTO {
       name: json['name'],
       description: json['description'],
       imageUrl: json['imageUrl'],
-      level: json['level'],
+      level: convertLevelToString(json['level']),
       reason: json['reason'],
       purpose: json['purpose'],
       otherDetails: json['other_details'],
       defaultPrice: json['default_price'],
       coursePrice: json['course_price'],
+      courseType: json['courseType'],
+      sectionType: json['sectionType'],
+      visible: json['visible'],
+      displayOrder: json['displayOrder'],
+      createdAt: json['createdAt'],
+        updatedAt: json['updatedAt'],
+
+
       topics: (json['topics'] as List<dynamic>)
           .map((topicJson) => Topic.fromJson(topicJson))
           .toList(),
@@ -53,5 +88,3 @@ class CourseDTO {
     );
   }
 }
-
-

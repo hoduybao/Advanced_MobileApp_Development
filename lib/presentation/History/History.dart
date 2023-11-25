@@ -248,9 +248,9 @@ class History extends StatelessWidget {
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [
-                Session(
-                  typeSession: "History", schedule:mySchedule.mySchedule[0]
-                ),
+                // Session(
+                //   typeSession: "History", schedule:mySchedule.mySchedule[0]
+                // ),
 
               ],
             ),

@@ -83,7 +83,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     tutors = context.watch<List<TutorDTO>>();
 
-
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll

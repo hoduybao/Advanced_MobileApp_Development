@@ -68,10 +68,10 @@ class InfoDetail extends StatelessWidget {
                   TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal),
                       recognizer: TapGestureRecognizer()
                   ..onTap=(){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DetailCourse()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => DetailCourse()),
+                    // );
                   }),
                 ],
               ),
@@ -92,10 +92,10 @@ class InfoDetail extends StatelessWidget {
                   TextSpan(text: 'Link', style: TextStyle(color: Colors.blue,fontWeight: FontWeight.normal),
                       recognizer: TapGestureRecognizer()
                         ..onTap=(){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => DetailCourse()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(builder: (context) => DetailCourse()),
+                          // );
                         }),
                 ],
               ),

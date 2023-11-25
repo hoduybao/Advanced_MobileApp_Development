@@ -1,12 +1,21 @@
+import 'package:advanced_mobileapp_development/model/course-dto.dart';
+import 'package:advanced_mobileapp_development/model/topic-dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class OverView extends StatelessWidget {
-  const OverView({super.key});
+class OverView extends StatefulWidget {
+  final CourseDTO course;
+  const OverView({super.key,required this.course});
 
   @override
+  State<OverView> createState() => _OverViewState();
+}
+
+class _OverViewState extends State<OverView> {
+  @override
   Widget build(BuildContext context) {
-    List<String> topics=["The Internet","Artifical Intelligence (AI)","Social Media","Internet Privacy","Live Streaming","Coding","Technology Transforming Healthcare","Smart Home Technology","Remote Work - A Dream Job?"];
+
+    List<Topic> topics=widget.course.topics;
     return Column(
       children: [
         Row(
@@ -64,7 +73,8 @@ class OverView extends StatelessWidget {
         Container(
           padding: EdgeInsets.only(left: 30),
           child: Text(
-            "Our world is rapidly changing thanks to new technology, and the vocabulary needed to discuss modern life is evolving almost daily. In this course you will learn the most up-to-date terminology from expertly crafted lessons as well from your native-speaking tutor.",
+    widget.course.reason
+            ,
             style: TextStyle(color: Colors.grey.shade700),
           ),
         ),
@@ -96,9 +106,8 @@ class OverView extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.only(left: 30),
-          child: Text(
-            "You will learn vocabulary related to timely topics like remote work, artificial intelligence, online privacy, and more. In addition to discussion questions, you will practice intermediate level speaking tasks such as using data to describe trends.",
-            style: TextStyle(color: Colors.grey.shade700),
+          child: Text(    widget.course.purpose,
+          style: TextStyle(color: Colors.grey.shade700),
           ),
         ),
         SizedBox(height: 15),
@@ -141,7 +150,7 @@ class OverView extends StatelessWidget {
               width: 10,
             ),
             Text(
-              "Intermedicate",
+              widget.course.level,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             )
           ],
@@ -184,7 +193,7 @@ class OverView extends StatelessWidget {
               width: 10,
             ),
             Text(
-              "9 topics",
+              topics.length.toString()+ " topics",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             )
           ],
@@ -270,7 +279,8 @@ class OverView extends StatelessWidget {
       ],
     );
   }
-  List<Widget> generateWidgets(List<String> list) {
+
+  List<Widget> generateWidgets(List<Topic> list) {
     List<Widget> widgets = [];
 
     for (int i = 0; i < list.length; i++) {
@@ -289,7 +299,7 @@ class OverView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text((i+1).toString()+"."),
-            Text(list[i]),
+            Text(list[i].name),
           ],
         ),
       )); // Thêm widget Text vào danh sách
@@ -297,5 +307,4 @@ class OverView extends StatelessWidget {
 
     return widgets;
   }
-
 }

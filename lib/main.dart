@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 
+import 'model/course-dto.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -30,6 +32,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Account account = Account(email: "", password: "");
   List<TutorDTO> listTutor=[];
+  List<CourseDTO> listCourse=[];
+
   final  mySchedule=new MyScheduleChangeNotifier();
   final favouriteRepository = new FavouriteRepository();
 
@@ -37,7 +41,22 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     loadTutors();
+    loadCourse();
   }
+  Future<void> loadCourse() async {
+    // Đọc dữ liệu từ file JSON
+    String jsonString = await rootBundle.loadString('assets/data/course.json');
+    Map<String, dynamic> jsonData = json.decode(jsonString);
+
+    // Lấy danh sách tutors từ dữ liệu JSON
+    List<Map<String, dynamic>> courseList = [];
+
+    if (jsonData['data'] != null && jsonData['data']['rows'] is List) {
+      courseList = List<Map<String, dynamic>>.from(jsonData['data']['rows']);
+    }
+      listCourse=courseList.map((json) => CourseDTO.fromJson(json)).toList();
+  }
+
   Future<void> loadTutors() async {
     // Đọc dữ liệu từ file JSON
     String jsonString = await rootBundle.loadString('assets/data/dataTutor.json');
@@ -95,6 +114,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => account),
         Provider(create: (context)=>listTutor),
+        Provider(create: (context)=>listCourse),
         ChangeNotifierProvider(create: (context) => favouriteRepository),
         ChangeNotifierProvider(create: (context)=> mySchedule),
       ],

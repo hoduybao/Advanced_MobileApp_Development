@@ -146,10 +146,9 @@ class Schedule extends StatelessWidget {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
-                );
+
+                loginCallback(0);
+
               },
             ),
           ],

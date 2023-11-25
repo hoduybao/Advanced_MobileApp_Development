@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/model/course-dto.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/course.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailCourse/overView.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/infoDetail.dart';
@@ -9,7 +10,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:expandable_text/expandable_text.dart';
 
 class DetailCourse extends StatefulWidget {
-  const DetailCourse({super.key});
+  final CourseDTO course;
+  const DetailCourse({super.key,required this.course});
 
   @override
   State<DetailCourse> createState() => _DetailCourseState();
@@ -70,9 +72,9 @@ class _DetailCourseState extends State<DetailCourse> {
                 padding: EdgeInsets.only(left: 20,right: 20,bottom: 20,top: 10),
                 child: Column(
                   children: [
-                    Course(type: "DetailCourse",image: "images/AvatarCourse.png",title: "Life in the Internet Age",description: "Let's discuss how technology is changing the way we live",level: "",numberLesson: "",),
+                    Course(type: "DetailCourse",course:widget.course),
                     SizedBox(height: 30,),
-                    OverView()
+                    OverView(course: widget.course)
                   ],
                 ))));
   }

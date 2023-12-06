@@ -8,6 +8,7 @@ import 'package:advanced_mobileapp_development/presentation/History/History.dart
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:advanced_mobileapp_development/presentation/Login/Login.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
+import 'package:advanced_mobileapp_development/presentation/Setting/Setting.dart';
 import 'package:advanced_mobileapp_development/repository/favorite-repository.dart';
 import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 
 import 'model/course-dto.dart';
+import 'model/user-dto.dart';
 
 void main() {
   runApp(MyApp());
@@ -36,13 +38,32 @@ class _MyAppState extends State<MyApp> {
 
   final  mySchedule=new MyScheduleChangeNotifier();
   final favouriteRepository = new FavouriteRepository();
+  late User userData;
 
   @override
   void initState() {
     // TODO: implement initState
+
     loadTutors();
     loadCourse();
+     loadUser();
   }
+  Future<void> loadUser() async {
+    // Đọc dữ liệu từ file JSON
+    User data;
+    String jsonString = await rootBundle.loadString('assets/data/user.json');
+    Map<String, dynamic> jsonData = json.decode(jsonString);
+
+    // Lấy danh sách tutors từ dữ liệu JSON
+    Map<String, dynamic> userJson = {};
+
+    if (jsonData['user'] != null) {
+      userJson = Map<String, dynamic>.from(jsonData['user']);
+    }
+    print(userJson);
+    userData=User.fromJson(userJson);
+  }
+
   Future<void> loadCourse() async {
     // Đọc dữ liệu từ file JSON
     String jsonString = await rootBundle.loadString('assets/data/course.json');
@@ -117,6 +138,7 @@ class _MyAppState extends State<MyApp> {
         Provider(create: (context)=>listCourse),
         ChangeNotifierProvider(create: (context) => favouriteRepository),
         ChangeNotifierProvider(create: (context)=> mySchedule),
+        ChangeNotifierProvider(create: (context)=>userData)
       ],
       child: MaterialApp(
           title: 'LetTutor',
@@ -143,7 +165,7 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> _buildScreens() {
-      return [Home(loginCallback), Courses(loginCallback), Schedule(loginCallback), History(loginCallback)];
+      return [Home(loginCallback), Courses(loginCallback), Schedule(loginCallback), History(loginCallback),SettingPage(loginCallback)];
     }
 
     List<PersistentBottomNavBarItem> _navBarsItems() {
@@ -169,6 +191,12 @@ class BottomNavBar extends StatelessWidget {
         PersistentBottomNavBarItem(
           icon: Icon(Icons.history),
           title: ("History"),
+          activeColorPrimary: Colors.blue,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.settings),
+          title: ("Setting"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
         ),

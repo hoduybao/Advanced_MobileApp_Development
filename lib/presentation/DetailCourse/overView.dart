@@ -3,6 +3,8 @@ import 'package:advanced_mobileapp_development/model/topic-dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../DetailLesson/lesson.dart';
+
 class OverView extends StatefulWidget {
   final CourseDTO course;
   const OverView({super.key,required this.course});
@@ -284,23 +286,32 @@ class _OverViewState extends State<OverView> {
     List<Widget> widgets = [];
 
     for (int i = 0; i < list.length; i++) {
-      widgets.add( Container(
-        margin: EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-                width: 0.5,
-                color: Colors.grey.shade300
-            )
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 15,vertical: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text((i+1).toString()+"."),
-            Text(list[i].name),
-          ],
+      widgets.add( GestureDetector(
+        onTap: () {
+          // Handle the onTap event here
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>  Lesson(title: list[i].name, url: list[i].nameFile)),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                  width: 0.5,
+                  color: Colors.grey.shade300
+              )
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 15,vertical: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text((i+1).toString()+"."),
+              Text(list[i].name),
+            ],
+          ),
         ),
       )); // Thêm widget Text vào danh sách
     }

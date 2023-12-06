@@ -1,21 +1,27 @@
+import 'dart:async';
+
+import 'package:advanced_mobileapp_development/model/schedule-dto.dart';
 import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
 import 'package:advanced_mobileapp_development/presentation/VideoCall/VideoCallPage.dart';
+import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../main.dart';
 import '../../model/rate-dto.dart';
 import 'listTutors.dart';
 
-typedef FilterCallback = void Function(String filter,String nameTutor,List<String> nation);
+typedef FilterCallback = void Function(
+    String filter, String nameTutor, List<String> nation);
 
 class Home extends StatefulWidget {
-  const Home(this.loginCallback,{super.key});
+  const Home(this.loginCallback, {super.key});
   final LoginCallback loginCallback;
   @override
   State<Home> createState() => _HomeState();
@@ -23,65 +29,65 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<TutorDTO> tutorsFilter = [];
-  List<TutorDTO> tutors=[];
+  List<TutorDTO> tutors = [];
 
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-    filterCallback("All","",[]);
+      filterCallback("All", "", []);
     });
   }
-  void filterCallback(String filter,String nameTutor,List<String> nation) {
-    List<TutorDTO> temp=[];
-    if (filter == "All") {
-        temp = tutors;
-    } else {
 
-        temp = tutors
-            .where((tutor) => tutor.specialties.contains(filter))
-            .toList();
+  void filterCallback(String filter, String nameTutor, List<String> nation) {
+    List<TutorDTO> temp = [];
+    if (filter == "All") {
+      temp = tutors;
+    } else {
+      temp =
+          tutors.where((tutor) => tutor.specialties.contains(filter)).toList();
     }
 
-    if(!nation.isEmpty)
-    {
-      List<TutorDTO> filterOfNation=[];
+    if (!nation.isEmpty) {
+      List<TutorDTO> filterOfNation = [];
       nation.forEach((element) {
-        if (element=="Foreign Tutor") {
-
-          filterOfNation =filterOfNation+temp
-              .where((tutor) => !tutor.country.contains("US")&&!tutor.country.contains("England")&&!tutor.country.contains("Vietnam"))
-              .toList();
-
-        } else if(element=="Vietnamese Tutor"){
-          filterOfNation =filterOfNation+temp
-              .where((tutor) => tutor.country.contains("Vietnam"))
-              .toList();
-        }
-        else if(element=="Native English Tutor")
-        {
-
-          filterOfNation =filterOfNation+temp
-              .where((tutor) => tutor.country.contains("US")||tutor.country.contains("England"))
-              .toList();
-
+        if (element == "Foreign Tutor") {
+          filterOfNation = filterOfNation +
+              temp
+                  .where((tutor) =>
+                      !tutor.country.contains("US") &&
+                      !tutor.country.contains("England") &&
+                      !tutor.country.contains("Vietnam"))
+                  .toList();
+        } else if (element == "Vietnamese Tutor") {
+          filterOfNation = filterOfNation +
+              temp.where((tutor) => tutor.country.contains("Vietnam")).toList();
+        } else if (element == "Native English Tutor") {
+          filterOfNation = filterOfNation +
+              temp
+                  .where((tutor) =>
+                      tutor.country.contains("US") ||
+                      tutor.country.contains("England"))
+                  .toList();
         }
       });
-      temp=filterOfNation;
+      temp = filterOfNation;
     }
     temp = temp
-        .where((tutor) => tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
+        .where((tutor) =>
+            tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
         .toList();
 
     setState(() {
-      tutorsFilter=temp;
+      tutorsFilter = temp;
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     tutors = context.watch<List<TutorDTO>>();
+    MyScheduleChangeNotifier mySchedule =
+        context.watch<MyScheduleChangeNotifier>();
 
     return Scaffold(
       endDrawer: Drawer(
@@ -140,7 +146,8 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home(widget.loginCallback)),
+                  MaterialPageRoute(
+                      builder: (context) => Home(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -159,7 +166,8 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses(widget.loginCallback)),
+                  MaterialPageRoute(
+                      builder: (context) => Courses(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -178,7 +186,8 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule(widget.loginCallback)),
+                  MaterialPageRoute(
+                      builder: (context) => Schedule(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -197,7 +206,8 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History(widget.loginCallback)),
+                  MaterialPageRoute(
+                      builder: (context) => History(widget.loginCallback)),
                 );
                 // Update the state of the app.
                 // ...
@@ -268,7 +278,7 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
           child: Container(
               child: Column(children: [
-        UpcomingLesson(),
+        UpcomingLesson(mySchedule: mySchedule),
         SearchTutor(filterCallback),
         Divider(
           // Add a horizontal line
@@ -284,12 +294,109 @@ class _HomeState extends State<Home> {
   }
 }
 
-class UpcomingLesson extends StatelessWidget {
-  const UpcomingLesson({super.key});
+class UpcomingLesson extends StatefulWidget {
+  const UpcomingLesson({required this.mySchedule, super.key});
+  final MyScheduleChangeNotifier mySchedule;
+
+  @override
+  State<UpcomingLesson> createState() => _UpcomingLessonState();
+}
+
+class _UpcomingLessonState extends State<UpcomingLesson> {
+  int? timestamp;
+  int? endstamp;
+  late DateTime targetTime;
+  late Timer countdownTimer;
+  late Duration remainingTime;
+
+  ScheduleDTO? upcomingLesson = null;
+
+  bool compareTime(int time1, int time2) {
+    DateTime dateTime1 = DateTime.fromMillisecondsSinceEpoch(time1);
+    DateTime dateTime2 = DateTime.fromMillisecondsSinceEpoch(time2);
+
+    // Thời điểm hiện tại
+    DateTime now = DateTime.now();
+
+    // Tính khoảng cách thời gian từ mỗi timestamp đến thời điểm hiện tại
+    Duration difference1 = dateTime1.difference(now).abs();
+    Duration difference2 = dateTime2.difference(now).abs();
+
+    // So sánh khoảng cách thời gian
+    if (difference1 < difference2) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.mySchedule.mySchedule.length != 0) {
+      upcomingLesson = widget.mySchedule.mySchedule.reduce(
+          (current, schedule) =>
+              compareTime(schedule.startTimestamp, current.startTimestamp)
+                  ? schedule
+                  : current);
+      timestamp = upcomingLesson?.startTimestamp;
+      endstamp=upcomingLesson?.endTimestamp;
+      targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp!);
+      updateRemainingTime();
+      startCountdown();
+    }
+  }
+
+  void updateRemainingTime() {
+    DateTime now = DateTime.now();
+    remainingTime =
+        targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
+  }
+
+  void startCountdown() {
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        updateRemainingTime();
+      });
+
+      if (remainingTime <= Duration.zero) {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    countdownTimer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Color.fromARGB(255, 12, 61, 223);
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    if(widget.mySchedule.mySchedule.length!=0)
+    {
+      int hours = remainingTime.inHours;
+      int minutes = (remainingTime.inMinutes % 60);
+      int seconds = (remainingTime.inSeconds % 60);
+    }
+
+
+    String convertTimeToString(int time1, int time2) {
+      DateTime timestart = DateTime.fromMillisecondsSinceEpoch(time1);
+      DateTime timeend = DateTime.fromMillisecondsSinceEpoch(time2);
+
+      String start =
+          "${timestart.hour.toString().length == 1 ? "0" + timestart.hour.toString() : timestart.hour.toString()}:${timestart.minute.toString().length == 1 ? "0" + timestart.minute.toString() : timestart.minute.toString()}";
+      String end =
+          "${timeend.hour.toString().length == 1 ? "0" + timeend.hour.toString() : timeend.hour.toString()}:${timeend.minute.toString().length == 1 ? "0" + timeend.minute.toString() : timeend.minute.toString()}";
+      String result = start + " - " + end;
+      return result;
+    }
 
     return Container(
       width: double.infinity,
@@ -298,81 +405,90 @@ class UpcomingLesson extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "Upcoming lesson",
+            widget.mySchedule.mySchedule.length == 0
+                ? "You have no upcoming lesson."
+                : "Upcoming lesson",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 22, color: Colors.white),
           ),
           SizedBox(
-            height: 20,
+            height:widget.mySchedule.mySchedule.length!=0? 20:0,
           ),
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    Text(
-                      "Thu, 26 Oct 23",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    Text(
-                      "03:30 - 03:55",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    Text(
-                      "(start in 100:02:43)",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: Colors.yellow),
-                    ),
-                  ],
+          Visibility(
+            visible: widget.mySchedule.mySchedule.length != 0,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Text(
+                        DateFormat.yMMMMEEEEd().format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                timestamp!=null?timestamp!:0)),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      Text(
+                        convertTimeToString(timestamp!=null?timestamp!:0,
+                            endstamp!=null?endstamp!:0),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      Text(
+                        "Start in ($hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')})",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Colors.yellow),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: TextButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(20), // Đặt góc bo tròn
+                Expanded(
+                  flex: 1,
+                  child: TextButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(20), // Đặt góc bo tròn
+                          ),
                         ),
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => VideoCallPage()),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.slow_motion_video,
-                          color: Colors.blueAccent,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          "Enter lesson room",
-                          style:
-                              TextStyle(color: Colors.blueAccent, fontSize: 14),
-                        )
-                      ],
-                    )),
-              )
-            ],
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => VideoCallPage()),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.slow_motion_video,
+                            color: Colors.blueAccent,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Enter lesson room",
+                            style: TextStyle(
+                                color: Colors.blueAccent, fontSize: 14),
+                          )
+                        ],
+                      )),
+                )
+              ],
+            ),
           ),
           SizedBox(
             height: 20,
           ),
           Text(
-            "Total lesson time is 507 hours 55 minutes",
+            "Total lesson time is 10 hours 20 minutes",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,

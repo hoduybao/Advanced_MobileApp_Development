@@ -6,17 +6,17 @@ class BookingInforDTO {
   final String scheduleDetailId;
   final String tutorMeetingLink;
   final String studentMeetingLink;
-  final String googleMeetLink;
-  final String studentRequest;
-  final String tutorReview;
-  final String scoreByTutor;
+  final dynamic googleMeetLink;
+  final dynamic studentRequest;
+  final dynamic tutorReview;
+  final dynamic scoreByTutor;
   final String createdAt;
   final String updatedAt;
-  final String recordUrl;
-  final String cancelReasonId;
-  final String lessonPlanId;
-  final String cancelNote;
-  final String calendarId;
+  final dynamic recordUrl;
+  final dynamic cancelReasonId;
+  final dynamic lessonPlanId;
+  final dynamic cancelNote;
+  final dynamic calendarId;
   final bool isDeleted;
   final bool isTrial;
 

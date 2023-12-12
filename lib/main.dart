@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:advanced_mobileapp_development/model/account-dto.dart';
-import 'package:advanced_mobileapp_development/model/rate-dto.dart';
 import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
@@ -157,15 +156,20 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class BottomNavBar extends StatelessWidget {
+class BottomNavBar extends StatefulWidget {
   const BottomNavBar(this.loginCallback,{super.key});
   final LoginCallback loginCallback;
 
+  @override
+  State<BottomNavBar> createState() => _BottomNavBarState();
+}
 
+class _BottomNavBarState extends State<BottomNavBar> {
+  PersistentTabController _controller= PersistentTabController(initialIndex: 0);
   @override
   Widget build(BuildContext context) {
     List<Widget> _buildScreens() {
-      return [Home(loginCallback), Courses(loginCallback), Schedule(loginCallback), History(loginCallback),SettingPage(loginCallback)];
+      return [Home(widget.loginCallback), Courses(widget.loginCallback), Schedule(widget.loginCallback), History(widget.loginCallback),SettingPage(widget.loginCallback)];
     }
 
     List<PersistentBottomNavBarItem> _navBarsItems() {
@@ -203,9 +207,7 @@ class BottomNavBar extends StatelessWidget {
       ];
     }
 
-    PersistentTabController _controller;
 
-    _controller = PersistentTabController(initialIndex: 0);
 
     return PersistentTabView(
       context,

@@ -40,7 +40,7 @@ class _SessionState extends State<Session> {
   @override
   Widget build(BuildContext context) {
     List<TutorDTO> listTutor = context.watch<List<TutorDTO>>();
-    List<TutorDTO> myTutor = listTutor.where((element) => element.id==widget.schedule.tutorId).toList();
+    List<TutorDTO> myTutor = listTutor.where((element) => element.userId==widget.schedule.tutorId).toList();
     return Container(
       margin: EdgeInsets.only(top: 20),
       padding: EdgeInsets.all(15),
@@ -72,8 +72,8 @@ class _SessionState extends State<Session> {
                     ),
                   ),
                   child: ClipOval(
-                    child: Image.asset(
-                        myTutor[0].avatar!=null?listTutor[0].avatar:""), // Thay thế bằng hình ảnh của bạn
+                    child: Image.network(
+                        myTutor[0].avatar!=null?listTutor[0].avatar:"https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg"), // Thay thế bằng hình ảnh của bạn
                   ),
                 ),
                 SizedBox(
@@ -146,7 +146,7 @@ class _SessionState extends State<Session> {
                   children: [
                     Text(
                       widget.typeSession == "Schedule"
-                          ? convertTime(widget.schedule.scheduleDetails[0].startPeriodTimestamp,widget.schedule.scheduleDetails[0].endPeriodTimestamp)
+                          ? convertTime(widget.schedule.startTimestamp,widget.schedule.endTimestamp)
                           : "Lesson Time: 03:30 - 03:55",
                       style: TextStyle(
                         fontSize: 18,

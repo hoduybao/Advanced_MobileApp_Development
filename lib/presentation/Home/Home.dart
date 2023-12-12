@@ -27,13 +27,19 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
+
   List<TutorDTO> tutorsFilter = [];
   List<TutorDTO> tutors = [];
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    print("huhu");
+
     Future.delayed(Duration.zero, () {
       filterCallback("All", "", []);
     });
@@ -85,6 +91,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     tutors = context.watch<List<TutorDTO>>();
     MyScheduleChangeNotifier mySchedule =
         context.watch<MyScheduleChangeNotifier>();
@@ -302,12 +309,16 @@ class UpcomingLesson extends StatefulWidget {
   State<UpcomingLesson> createState() => _UpcomingLessonState();
 }
 
-class _UpcomingLessonState extends State<UpcomingLesson> {
+class _UpcomingLessonState extends State<UpcomingLesson> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
   int? timestamp;
   int? endstamp;
   late DateTime targetTime;
   late Timer countdownTimer;
-  late Duration remainingTime;
+  Duration remainingTime=Duration.zero;
 
   ScheduleDTO? upcomingLesson = null;
 
@@ -330,6 +341,13 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
     }
   }
 
+  void updateRemainingTime() {
+    DateTime now = DateTime.now();
+    setState(() {
+      remainingTime =
+          targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -340,30 +358,22 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
               compareTime(schedule.startTimestamp, current.startTimestamp)
                   ? schedule
                   : current);
+
       timestamp = upcomingLesson?.startTimestamp;
-      endstamp=upcomingLesson?.endTimestamp;
+      endstamp = upcomingLesson?.endTimestamp;
       targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp!);
-      updateRemainingTime();
-      startCountdown();
-    }
-  }
+      DateTime now = DateTime.now();
+      remainingTime =
+          targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
 
-  void updateRemainingTime() {
-    DateTime now = DateTime.now();
-    remainingTime =
-        targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
-  }
-
-  void startCountdown() {
-    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
+      countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
         updateRemainingTime();
-      });
 
-      if (remainingTime <= Duration.zero) {
-        timer.cancel();
-      }
-    });
+        if (remainingTime <= Duration.zero) {
+          timer.cancel();
+        }
+      });
+    }
   }
 
   @override
@@ -374,17 +384,16 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Color backgroundColor = Color.fromARGB(255, 12, 61, 223);
     int hours = 0;
     int minutes = 0;
     int seconds = 0;
-    if(widget.mySchedule.mySchedule.length!=0)
-    {
-      int hours = remainingTime.inHours;
-      int minutes = (remainingTime.inMinutes % 60);
-      int seconds = (remainingTime.inSeconds % 60);
+    if (widget.mySchedule.mySchedule.length != 0) {
+      hours = remainingTime.inHours;
+      minutes = (remainingTime.inMinutes % 60);
+      seconds = (remainingTime.inSeconds % 60);
     }
-
 
     String convertTimeToString(int time1, int time2) {
       DateTime timestart = DateTime.fromMillisecondsSinceEpoch(time1);
@@ -412,7 +421,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
             style: TextStyle(fontSize: 22, color: Colors.white),
           ),
           SizedBox(
-            height:widget.mySchedule.mySchedule.length!=0? 20:0,
+            height: widget.mySchedule.mySchedule.length != 0 ? 20 : 0,
           ),
           Visibility(
             visible: widget.mySchedule.mySchedule.length != 0,
@@ -423,15 +432,15 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
                   child: Column(
                     children: [
                       Text(
-                        DateFormat.yMMMMEEEEd().format(
+                        DateFormat('EEEE, MMMM d').format(
                             DateTime.fromMillisecondsSinceEpoch(
-                                timestamp!=null?timestamp!:0)),
+                                timestamp != null ? timestamp! : 0)),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       Text(
-                        convertTimeToString(timestamp!=null?timestamp!:0,
-                            endstamp!=null?endstamp!:0),
+                        convertTimeToString(timestamp != null ? timestamp! : 0,
+                            endstamp != null ? endstamp! : 0),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
@@ -488,7 +497,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
             height: 20,
           ),
           Text(
-            "Total lesson time is 10 hours 20 minutes",
+            "Total lesson time is 0 hours 0 minutes",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,

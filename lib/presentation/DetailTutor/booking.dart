@@ -21,7 +21,10 @@ class _BookingState extends State<Booking> {
   @override
   void initState() {
     super.initState();
-    _loadScheduleFuture = loadScheduleOfTutor();
+    setState(() {
+      _loadScheduleFuture = loadScheduleOfTutor();
+
+    });
   }
 
   Future<List<ScheduleDTO>> loadScheduleOfTutor() async {
@@ -33,6 +36,7 @@ class _BookingState extends State<Booking> {
     if (jsonData['data'] != null && jsonData['data'] is List) {
       schedules = List<Map<String, dynamic>>.from(jsonData["data"]);
     }
+    print("Hihi" + schedules.length.toString());
 
     return schedules.map((json) => ScheduleDTO.fromJson(json)).toList();
   }
@@ -67,21 +71,16 @@ class _BookingState extends State<Booking> {
       return regions;
     }
 
-    return FutureBuilder(
+    return FutureBuilder<List<ScheduleDTO>>(
       future: _loadScheduleFuture,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<ScheduleDTO>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (snapshot.hasError) {
-          print(snapshot);
-          return Center(
-            child: Text('Error loading data'),
-          );
-        } else {
-          // Dữ liệu đã được tải, có thể sử dụng nó
+        } else if (snapshot.hasData) {
           List<ScheduleDTO> listScheduleOfTutor = snapshot.data as List<ScheduleDTO>;
+          print("Zoooooooooooo"+listScheduleOfTutor.length.toString());
           return Container(
             height: 2520,
             child: SfCalendar(
@@ -163,6 +162,12 @@ class _BookingState extends State<Booking> {
                 }
               },
             ),
+          );
+
+        } else {
+          // Dữ liệu đã được tải, có thể sử dụng nó
+          return Center(
+            child: Text('Error loading data'),
           );
         }
       },

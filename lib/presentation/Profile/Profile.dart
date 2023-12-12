@@ -238,140 +238,114 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       body: SingleChildScrollView(
-
-            child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10,bottom: 10),
-              child: Column(
-                children: [
-                Container(
-                  height: 50,
-                  child: TextField(
-                  // validator: (value) {
-                  //   return validator!(value ?? "");
-                  // },
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                    hintStyle: TextStyle(color: Colors.grey.shade400),
-                    isDense: true, // Added this
-                    contentPadding: EdgeInsets.all(12),
-                  ),
-              ),
+        child: Container(
+          margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+          child: Column(
+            children: [
+              SizedBox(height: 40),
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                          boxShadow: [
+                            BoxShadow(
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                                color: Colors.black.withOpacity(0.1))
+                          ],
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: _pickedFile != null
+                                  ? FileImage(File(_pickedFile!.path))
+                                      as ImageProvider<Object>
+                                  : NetworkImage(userData.avatar ??
+                                      "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg"))),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          changeImage();
+                        },
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              width: 4,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            color: Colors.blue.shade700,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-
-
-                  // SizedBox(height: 40),
-                  //
-                  // Center(
-                  //   child: Stack(
-                  //     children: [
-                  //       Container(
-                  //         width: 120,
-                  //         height: 120,
-                  //         decoration: BoxDecoration(
-                  //             border: Border.all(
-                  //                 width: 4,
-                  //                 color: Theme.of(context)
-                  //                     .scaffoldBackgroundColor),
-                  //             boxShadow: [
-                  //               BoxShadow(
-                  //                   spreadRadius: 2,
-                  //                   blurRadius: 10,
-                  //                   color: Colors.black.withOpacity(0.1))
-                  //             ],
-                  //             shape: BoxShape.circle,
-                  //             image: DecorationImage(
-                  //                 fit: BoxFit.cover,
-                  //                 image: _pickedFile != null
-                  //                     ? FileImage(File(_pickedFile!.path))
-                  //                         as ImageProvider<Object>
-                  //                     : NetworkImage(userData.avatar ??
-                  //                         "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg"))),
-                  //       ),
-                  //       Positioned(
-                  //         bottom: 0,
-                  //         right: 0,
-                  //         child: GestureDetector(
-                  //           onTap: () {
-                  //             changeImage();
-                  //           },
-                  //           child: Container(
-                  //             height: 40,
-                  //             width: 40,
-                  //             decoration: BoxDecoration(
-                  //               shape: BoxShape.circle,
-                  //               border: Border.all(
-                  //                 width: 4,
-                  //                 color:
-                  //                     Theme.of(context).scaffoldBackgroundColor,
-                  //               ),
-                  //               color: Colors.blue.shade700,
-                  //             ),
-                  //             child: Icon(
-                  //               Icons.edit,
-                  //               color: Colors.white,
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       )
-                  //     ],
-                  //   ),
-                  // ),
-                  // SizedBox(height: 10),
-                  // Center(
-                  //   child: Text(
-                  //     userData?.name ?? "Anonymous",
-                  //     style: TextStyle(
-                  //       fontSize: 32,
-                  //       fontWeight: FontWeight.w500,
-                  //     ),
-                  //   ),
-                  // ),
-                  // SizedBox(height: 10),
-                  // Center(child: _buildInfo("Account ID: ", userData.id ?? "")),
-                  // SizedBox(height: 10),
-                  // Center(
-                  //     child: GestureDetector(
-                  //   onTap: () {},
-                  //   child: Container(
-                  //       child: Text(
-                  //     "Others review you",
-                  //     style: TextStyle(fontSize: 14, color: Colors.blue),
-                  //   )),
-                  // )),
-                  // SizedBox(height: 10),
-                  // Center(
-                  //     child: GestureDetector(
-                  //   onTap: () {},
-                  //   child: Container(
-                  //       child: Text(
-                  //     "Change Password",
-                  //     style: TextStyle(fontSize: 14, color: Colors.blue),
-                  //   )),
-                  // )),
-                  // SizedBox(height: 40),
-                  // Container(
-                  //   width: double.infinity,
-                  //   color: Colors.grey.shade200,
-                  //   padding: EdgeInsets.all(15),
-                  //   child: Text(
-                  //     "Account",
-                  //     style: TextStyle(
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w400,
-                  //     ),
-                  //   ),
-                  // ),
-                  // _buildForm(userData),
-                ],
               ),
-            ),
-
+              SizedBox(height: 10),
+              Center(
+                child: Text(
+                  userData?.name ?? "Anonymous",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Center(child: _buildInfo("Account ID: ", userData.id ?? "")),
+              SizedBox(height: 10),
+              Center(
+                  child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                    child: Text(
+                  "Others review you",
+                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                )),
+              )),
+              SizedBox(height: 10),
+              Center(
+                  child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                    child: Text(
+                  "Change Password",
+                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                )),
+              )),
+              SizedBox(height: 40),
+              Container(
+                width: double.infinity,
+                color: Colors.grey.shade200,
+                padding: EdgeInsets.all(15),
+                child: Text(
+                  "Account",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              _buildForm(userData),
+            ],
+          ),
         ),
-
+      ),
     );
   }
 

@@ -1,19 +1,17 @@
-import 'package:advanced_mobileapp_development/main.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
-import 'package:advanced_mobileapp_development/presentation/Schedule/session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
+import '../../Provider/auth_provider.dart';
 import '../../repository/schedule-student-repository.dart';
 import '../Courses/Courses.dart';
 import '../Schedule/Schedule.dart';
 
 class History extends StatelessWidget {
-  const History(this.loginCallback,{super.key});
-   final LoginCallback loginCallback;
+  const History({super.key});
   @override
   Widget build(BuildContext context) {
     MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
@@ -75,7 +73,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Home(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Home()),
                 );
                 // Update the state of the app.
                 // ...
@@ -94,7 +92,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Courses(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Courses()),
                 );
                 // Update the state of the app.
                 // ...
@@ -113,7 +111,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
+                  MaterialPageRoute(builder: (context) => Schedule()),
                 );
                 // Update the state of the app.
                 // ...
@@ -132,7 +130,7 @@ class History extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => History(loginCallback)),
+                  MaterialPageRoute(builder: (context) => History()),
                 );
                 // Update the state of the app.
                 // ...
@@ -147,10 +145,8 @@ class History extends StatelessWidget {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Schedule(loginCallback)),
-                );
+                var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                authProvider.clearUserInfo();
               },
             ),
           ],

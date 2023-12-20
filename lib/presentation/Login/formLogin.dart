@@ -1,12 +1,17 @@
+import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
+import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../main.dart';
 import '../../model/account-dto.dart';
+import 'package:advanced_mobileapp_development/model/user/user.dart';
+
+import '../../model/user/token.dart';
+
 
 class FormLogin extends StatefulWidget {
-  FormLogin(this.callback);
-  final LoginCallback callback;
+  FormLogin();
 
 
   @override
@@ -180,19 +185,36 @@ class _FormLoginState extends State<FormLogin> {
             child: TextButton(
                 onPressed: () {
                   if(isTypeEmail&&emailController.text!=""&&passwordController.text!=""){
-                    if(emailController.text==account.email&&passwordController.text==account.password)
-                    {
-                      setState(() {
-                        isSuccess=true;
-                      });
-                      widget.callback(1);
-                    }
-                    else{
-                      setState(() {
-                        isSuccess=false;
-                      });
+                    // if(emailController.text==account.email&&passwordController.text==account.password)
+                    // {
+                    //   setState(() {
+                    //     isSuccess=true;
+                    //   });
+                    //   widget.callback(1);
+                    // }
+                    // else{
+                    //   setState(() {
+                    //     isSuccess=false;
+                    //   });
+                    //
+                    // }
 
-                    }
+                    var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                    authProvider.authRepository.loginByAccount(email: emailController.text, password: passwordController.text, onSuccess: (UserModel userModel,Token token){
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Login Successfully!'),backgroundColor: Colors.green,),
+                      );
+                      authProvider.saveLoginInfo(userModel, token);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Home()),
+                      );
+                    }, onFail: (String error){
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${error.toString()}')),
+                      );
+                    });
+
                   }
 
 

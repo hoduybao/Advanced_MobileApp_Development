@@ -13,16 +13,14 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../main.dart';
-import '../../model/rate-dto.dart';
+import '../../Provider/auth_provider.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(
     String filter, String nameTutor, List<String> nation);
 
 class Home extends StatefulWidget {
-  const Home(this.loginCallback, {super.key});
-  final LoginCallback loginCallback;
+  const Home( {super.key});
   @override
   State<Home> createState() => _HomeState();
 }
@@ -153,8 +151,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => Home(widget.loginCallback)),
+                  MaterialPageRoute(builder: (context) => Home()),
                 );
                 // Update the state of the app.
                 // ...
@@ -173,8 +170,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => Courses(widget.loginCallback)),
+                  MaterialPageRoute(builder: (context) => Courses()),
                 );
                 // Update the state of the app.
                 // ...
@@ -193,8 +189,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => Schedule(widget.loginCallback)),
+                  MaterialPageRoute(builder: (context) => Schedule()),
                 );
                 // Update the state of the app.
                 // ...
@@ -213,8 +208,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => History(widget.loginCallback)),
+                  MaterialPageRoute(builder: (context) => History()),
                 );
                 // Update the state of the app.
                 // ...
@@ -229,7 +223,8 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                widget.loginCallback(0);
+                var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                authProvider.clearUserInfo();
               },
             ),
           ],

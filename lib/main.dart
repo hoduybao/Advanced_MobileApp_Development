@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
 import 'package:advanced_mobileapp_development/model/account-dto.dart';
 import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
@@ -21,7 +22,6 @@ import 'model/user-dto.dart';
 void main() {
   runApp(MyApp());
 }
-typedef LoginCallback = void Function(int _appState);
 
 class MyApp extends StatefulWidget {
   MyApp({super.key});
@@ -32,6 +32,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final Account account = Account(email: "", password: "");
+  AuthProvider authProvider=AuthProvider();
   List<TutorDTO> listTutor=[];
   List<CourseDTO> listCourse=[];
 
@@ -45,7 +46,7 @@ class _MyAppState extends State<MyApp> {
 
     loadTutors();
     loadCourse();
-     loadUser();
+    loadUser();
   }
   Future<void> loadUser() async {
     // Đọc dữ liệu từ file JSON
@@ -113,18 +114,11 @@ class _MyAppState extends State<MyApp> {
   }
 
 
-  int appState = 0;
-  void loginCallback(int _appState) {
-    setState(() {
-      appState = _appState;
-    });
-  }
-
   Widget displayWidget() {
-    if (appState == 0) {
-      return Login(loginCallback);
+    if (authProvider.currentUser==null) {
+      return Login();
     } else  {
-      return BottomNavBar(loginCallback);
+      return BottomNavBar();
     }
   }
   // This widget is the root of your application.
@@ -132,6 +126,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context)=>authProvider),
         ChangeNotifierProvider(create: (context) => account),
         Provider(create: (context)=>listTutor),
         Provider(create: (context)=>listCourse),
@@ -146,7 +141,7 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
           ),
           debugShowCheckedModeBanner: false,
-          home: Consumer<Account>(
+          home: Consumer<AuthProvider>(
           builder: (context, account, _) {
             return displayWidget();
           })
@@ -157,8 +152,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar(this.loginCallback,{super.key});
-  final LoginCallback loginCallback;
+  const BottomNavBar({super.key});
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
@@ -169,7 +163,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _buildScreens() {
-      return [Home(widget.loginCallback), Courses(widget.loginCallback), Schedule(widget.loginCallback), History(widget.loginCallback),SettingPage(widget.loginCallback)];
+      return [Home(), Courses(), Schedule(), History(),SettingPage()];
     }
 
     List<PersistentBottomNavBarItem> _navBarsItems() {

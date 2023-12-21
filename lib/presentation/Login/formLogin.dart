@@ -28,7 +28,6 @@ class _FormLoginState extends State<FormLogin> {
   TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    Account account=context.watch<Account>();
     return Container(
       margin: EdgeInsets.only(top: 30),
       child: Column(
@@ -185,39 +184,20 @@ class _FormLoginState extends State<FormLogin> {
             child: TextButton(
                 onPressed: () {
                   if(isTypeEmail&&emailController.text!=""&&passwordController.text!=""){
-                    // if(emailController.text==account.email&&passwordController.text==account.password)
-                    // {
-                    //   setState(() {
-                    //     isSuccess=true;
-                    //   });
-                    //   widget.callback(1);
-                    // }
-                    // else{
-                    //   setState(() {
-                    //     isSuccess=false;
-                    //   });
-                    //
-                    // }
+
 
                     var authProvider=Provider.of<AuthProvider>(context, listen: false);
                     authProvider.authRepository.loginByAccount(email: emailController.text, password: passwordController.text, onSuccess: (UserModel userModel,Token token){
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Login Successfully!'),backgroundColor: Colors.green,),
-                      );
+
                       authProvider.saveLoginInfo(userModel, token);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Home()),
-                      );
+
                     }, onFail: (String error){
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${error.toString()}')),
-                      );
+                     setState(() {
+                       isSuccess=false;
+                     });
                     });
 
                   }
-
-
 
                 },
                 style: ButtonStyle(

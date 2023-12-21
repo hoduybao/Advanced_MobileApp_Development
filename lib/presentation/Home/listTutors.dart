@@ -1,19 +1,26 @@
+import 'package:advanced_mobileapp_development/model/tutor/tutor_model.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/tutor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../model/tutor.dart';
-
 class ListTutors extends StatefulWidget {
 
-  const ListTutors(this.tutors, {super.key});
-  final List<TutorDTO> tutors;
+  const ListTutors(this.tutors,this._favTutorsId, {super.key});
+  final List<TutorModel> tutors;
+  final List<String> _favTutorsId;
+
 
   @override
   State<ListTutors> createState() => _ListTutorsState();
 }
 
 class _ListTutorsState extends State<ListTutors> {
+  bool checkIfTutorIsFavorite(TutorModel tutor) {
+    for (var element in widget._favTutorsId) {
+      if (element == tutor.userId) return true;
+    }
+    return false;
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,7 +45,7 @@ class _ListTutorsState extends State<ListTutors> {
               shrinkWrap: true,
               itemCount: widget.tutors.length,
               itemBuilder: (context, index) {
-                return Tutor(widget.tutors[index]);
+                return Tutor(widget.tutors[index],checkIfTutorIsFavorite(widget.tutors[index]));
                   // Add more customization here if needed
               },
             ),

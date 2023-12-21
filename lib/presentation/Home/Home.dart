@@ -14,286 +14,389 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
+import '../../model/tutor/tutor_model.dart';
+import '../../responses/list_tutor_response.dart';
+import '../../services/tutors.api.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(
     String filter, String nameTutor, List<String> nation);
 
 class Home extends StatefulWidget {
-  const Home( {super.key});
+  const Home({super.key});
   @override
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin  {
+class _HomeState extends State<Home> {
+  List<TutorModel> _tutorList = [];
+  List<String> _favTutorsId = [];
 
-  List<TutorDTO> tutorsFilter = [];
-  List<TutorDTO> tutors = [];
+
+  bool isLoading=true;
+  //Đã call api này chưa
+  bool hasCallAPI = false;
+
 
   @override
-  bool get wantKeepAlive => true;
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    var authProvider = Provider.of<AuthProvider>(context);
 
-  @override
-  void initState() {
-    super.initState();
-    print("huhu");
-
-    Future.delayed(Duration.zero, () {
-      filterCallback("All", "", []);
-    });
+    //Fetch API
+    if (!hasCallAPI) {
+      await Future.wait([
+        callAPIGetTutorList(1, TutorRepository(), authProvider),
+        //callApiGetListSchedules(BookingRepository(), authProvider)
+      ]).whenComplete(() {
+        if (mounted) {
+          setState(() {
+            hasCallAPI = true;
+            isLoading=false;
+          });
+        }
+      });
+    }
   }
 
   void filterCallback(String filter, String nameTutor, List<String> nation) {
-    List<TutorDTO> temp = [];
-    if (filter == "All") {
-      temp = tutors;
-    } else {
-      temp =
-          tutors.where((tutor) => tutor.specialties.contains(filter)).toList();
-    }
 
-    if (!nation.isEmpty) {
-      List<TutorDTO> filterOfNation = [];
-      nation.forEach((element) {
-        if (element == "Foreign Tutor") {
-          filterOfNation = filterOfNation +
-              temp
-                  .where((tutor) =>
-                      !tutor.country.contains("US") &&
-                      !tutor.country.contains("England") &&
-                      !tutor.country.contains("Vietnam"))
-                  .toList();
-        } else if (element == "Vietnamese Tutor") {
-          filterOfNation = filterOfNation +
-              temp.where((tutor) => tutor.country.contains("Vietnam")).toList();
-        } else if (element == "Native English Tutor") {
-          filterOfNation = filterOfNation +
-              temp
-                  .where((tutor) =>
-                      tutor.country.contains("US") ||
-                      tutor.country.contains("England"))
-                  .toList();
-        }
-      });
-      temp = filterOfNation;
-    }
-    temp = temp
-        .where((tutor) =>
-            tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
-        .toList();
 
-    setState(() {
-      tutorsFilter = temp;
-    });
+    // List<TutorDTO> temp = [];
+    // if (filter == "All") {
+    //   temp = tutors;
+    // } else {
+    //   temp =
+    //       tutors.where((tutor) => tutor.specialties.contains(filter)).toList();
+    // }
+    //
+    // if (!nation.isEmpty) {
+    //   List<TutorDTO> filterOfNation = [];
+    //   nation.forEach((element) {
+    //     if (element == "Foreign Tutor") {
+    //       filterOfNation = filterOfNation +
+    //           temp
+    //               .where((tutor) =>
+    //                   !tutor.country.contains("US") &&
+    //                   !tutor.country.contains("England") &&
+    //                   !tutor.country.contains("Vietnam"))
+    //               .toList();
+    //     } else if (element == "Vietnamese Tutor") {
+    //       filterOfNation = filterOfNation +
+    //           temp.where((tutor) => tutor.country.contains("Vietnam")).toList();
+    //     } else if (element == "Native English Tutor") {
+    //       filterOfNation = filterOfNation +
+    //           temp
+    //               .where((tutor) =>
+    //                   tutor.country.contains("US") ||
+    //                   tutor.country.contains("England"))
+    //               .toList();
+    //     }
+    //   });
+    //   temp = filterOfNation;
+    // }
+    // temp = temp
+    //     .where((tutor) =>
+    //         tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
+    //     .toList();
+    //
+    // setState(() {
+    //   tutorsFilter = temp;
+    // });
   }
 
+  Future<void> refreshHome(AuthProvider authProvider) async {
+    setState(() {
+       _tutorList= [];
+       _favTutorsId = [];
+       isLoading = true;
+    });
+    await Future.wait([
+      callAPIGetTutorList(1, TutorRepository(), authProvider),
+     // callApiGetListSchedules(BookingRepository(), authProvider)
+    ]).whenComplete(() {
+      setState(() {
+        isLoading= false;
+      });
+      return Future<void>.delayed(const Duration(seconds: 0));
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    tutors = context.watch<List<TutorDTO>>();
-    MyScheduleChangeNotifier mySchedule =
-        context.watch<MyScheduleChangeNotifier>();
+    var authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      endDrawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: [
-            Container(
-              height: 125,
-              child: DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue, border: null),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          child: Icon(
-                            Icons.close_outlined,
-                            color: Colors.white,
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        Text(
-                          "Menu",
-                          style: TextStyle(
-                              fontSize: 18,
+        endDrawer: Drawer(
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                height: 125,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(color: Colors.blue, border: null),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            child: Icon(
+                              Icons.close_outlined,
                               color: Colors.white,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          "",
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    )
-                  ],
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          Text(
+                            "Menu",
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            "",
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.people_alt,
-                color: Colors.blue.shade700,
-                size: 30,
+              ListTile(
+                leading: Icon(
+                  Icons.people_alt,
+                  color: Colors.blue.shade700,
+                  size: 30,
+                ),
+                title: const Text(
+                  'Tutors',
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
               ),
-              title: const Text(
-                'Tutors',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+              ListTile(
+                leading: Icon(
+                  Icons.school,
+                  color: Colors.blue.shade700,
+                  size: 30,
+                ),
+                title: const Text(
+                  'Courses',
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Courses()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Home()),
-                );
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.school,
-                color: Colors.blue.shade700,
-                size: 30,
+              ListTile(
+                leading: Icon(
+                  Icons.calendar_month,
+                  color: Colors.blue.shade700,
+                  size: 30,
+                ),
+                title: const Text(
+                  'Schedule',
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Schedule()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
               ),
-              title: const Text(
-                'Courses',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+              ListTile(
+                leading: Icon(
+                  Icons.history,
+                  color: Colors.blue.shade700,
+                  size: 30,
+                ),
+                title: const Text(
+                  'History',
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => History()),
+                  );
+                  // Update the state of the app.
+                  // ...
+                },
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Courses()),
-                );
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.calendar_month,
-                color: Colors.blue.shade700,
-                size: 30,
-              ),
-              title: const Text(
-                'Schedule',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Schedule()),
-                );
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.history,
-                color: Colors.blue.shade700,
-                size: 30,
-              ),
-              title: const Text(
-                'History',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => History()),
-                );
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.logout,
-                color: Colors.blue.shade700,
-                size: 30,
-              ),
-              title: const Text('Logout',
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
-              onTap: () {
-                var authProvider=Provider.of<AuthProvider>(context, listen: false);
-                authProvider.clearUserInfo();
-              },
-            ),
-          ],
-        ),
-      ),
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(50.0), // Define the height of the AppBar
-        child: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black
-                    .withOpacity(0.2), // Color and opacity of the shadow
-                spreadRadius: 5, // Spread radius of the shadow
-                blurRadius: 7, // Blur radius of the shadow
-                offset: const Offset(0, 3), // Offset of the shadow
+              ListTile(
+                leading: Icon(
+                  Icons.logout,
+                  color: Colors.blue.shade700,
+                  size: 30,
+                ),
+                title: const Text('Logout',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
+                onTap: () {
+                  var authProvider =
+                      Provider.of<AuthProvider>(context, listen: false);
+                  authProvider.clearUserInfo();
+                },
               ),
             ],
           ),
-          child: AppBar(
-              automaticallyImplyLeading: false,
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                // Status bar color
-                statusBarColor: Colors.black,
-                // Status bar brightness (optional)
-                statusBarIconBrightness:
-                    Brightness.light, // For Android (dark icons)
-              ),
-              title: const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.school,
-                        size: 45,
-                        color: Colors.blueAccent,
-                      ),
-                      SizedBox(width: 7),
-                      Text(
-                        "LetTutor",
-                        style: TextStyle(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ],
-              )),
         ),
-      ),
-      body: SingleChildScrollView(
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(50.0), // Define the height of the AppBar
           child: Container(
-              child: Column(children: [
-        UpcomingLesson(mySchedule: mySchedule),
-        SearchTutor(filterCallback),
-        Divider(
-          // Add a horizontal line
-          color: Colors.grey, // Line color
-          height: 10, // Line height
-          thickness: 0.5, // Line thickness
-          indent: 20, // Line indent on the left
-          endIndent: 10, // Line indent on the right
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black
+                      .withOpacity(0.2), // Color and opacity of the shadow
+                  spreadRadius: 5, // Spread radius of the shadow
+                  blurRadius: 7, // Blur radius of the shadow
+                  offset: const Offset(0, 3), // Offset of the shadow
+                ),
+              ],
+            ),
+            child: AppBar(
+                automaticallyImplyLeading: false,
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  // Status bar color
+                  statusBarColor: Colors.black,
+                  // Status bar brightness (optional)
+                  statusBarIconBrightness:
+                      Brightness.light, // For Android (dark icons)
+                ),
+                title: const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.school,
+                          size: 45,
+                          color: Colors.blueAccent,
+                        ),
+                        SizedBox(width: 7),
+                        Text(
+                          "LetTutor",
+                          style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
+          ),
         ),
-        ListTutors(tutorsFilter),
-      ]))),
-    );
+        body: RefreshIndicator(
+          onRefresh: () async {
+            refreshHome(authProvider);
+          },
+          child: SingleChildScrollView(
+              child: Container(
+                  child: Column(children: [
+           // UpcomingLesson(mySchedule: mySchedule),
+            SearchTutor(filterCallback),
+            Divider(
+              // Add a horizontal line
+              color: Colors.grey, // Line color
+              height: 10, // Line height
+              thickness: 0.5, // Line thickness
+              indent: 20, // Line indent on the left
+              endIndent: 10, // Line indent on the right
+            ),
+            ListTutors(_tutorList,_favTutorsId),
+          ]))),
+        ));
+
   }
+  Future<void> callAPIGetTutorList(int page, TutorRepository tutorRepository,
+      AuthProvider authProvider) async {
+    await tutorRepository.getListTutor(
+        accessToken: authProvider.token?.access?.token ?? "",
+        page: page,
+        perPage: 10,
+        onSuccess: (response) async {
+          _handleTutorListDataFromAPI(response);
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
+
+  // Future<void> searchTutor(String filter, String nameTutor, List<String> nation,TutorRepository tutorRepository,
+  //     AuthProvider authProvider) async {
+  //   await tutorRepository.searchTutor(
+  //        accessToken:authProvider.token!.access!.token??"" ,
+  //       page: 1,
+  //        nationality:nation ,
+  //       // onSuccess: (response) async {
+  //       //   _handleTutorListDataFromAPI(response);
+  //       // },
+  //       onFail: (error) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Error: ${error.toString()}')),
+  //         );
+  //       });
+  // }
+
+  void _handleTutorListDataFromAPI(ResponseGetListTutor response) {
+    response.favoriteTutor?.forEach((element) {
+      if (element.secondId != null) {
+        _favTutorsId.add(element.secondId!);
+      }
+    });
+
+    //Separate list
+    List<TutorModel> notFavoredList = [];
+    List<TutorModel> favoredList = [];
+    response.tutors?.rows?.forEach((element) {
+      if (checkIfTutorIsFavorite(element)) {
+        favoredList.add(element);
+      } else {
+        notFavoredList.add(element);
+      }
+    });
+
+    //Sort by score
+    favoredList.sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
+    notFavoredList.sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
+
+    //Add to final list
+    _tutorList.addAll(favoredList);
+    _tutorList.addAll(notFavoredList);
+  }
+  bool checkIfTutorIsFavorite(TutorModel tutor) {
+    for (var element in _favTutorsId) {
+      if (element == tutor.userId) return true;
+    }
+    return false;
+  }
+
 }
 
 class UpcomingLesson extends StatefulWidget {
@@ -304,8 +407,8 @@ class UpcomingLesson extends StatefulWidget {
   State<UpcomingLesson> createState() => _UpcomingLessonState();
 }
 
-class _UpcomingLessonState extends State<UpcomingLesson> with AutomaticKeepAliveClientMixin {
-
+class _UpcomingLessonState extends State<UpcomingLesson>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -313,7 +416,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> with AutomaticKeepAlive
   int? endstamp;
   late DateTime targetTime;
   late Timer countdownTimer;
-  Duration remainingTime=Duration.zero;
+  Duration remainingTime = Duration.zero;
 
   ScheduleDTO? upcomingLesson = null;
 
@@ -343,6 +446,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> with AutomaticKeepAlive
           targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -503,3 +607,6 @@ class _UpcomingLessonState extends State<UpcomingLesson> with AutomaticKeepAlive
     );
   }
 }
+
+
+

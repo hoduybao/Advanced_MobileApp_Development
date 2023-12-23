@@ -17,7 +17,6 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 
 import 'model/course-dto.dart';
-import 'model/user-dto.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,7 +37,7 @@ class _MyAppState extends State<MyApp> {
 
   final  mySchedule=new MyScheduleChangeNotifier();
   final favouriteRepository = new FavouriteRepository();
-  late User userData;
+ // late User userData;
 
   @override
   void initState() {
@@ -46,23 +45,23 @@ class _MyAppState extends State<MyApp> {
 
     loadTutors();
     loadCourse();
-    loadUser();
+   // loadUser();
   }
-  Future<void> loadUser() async {
-    // Đọc dữ liệu từ file JSON
-    User data;
-    String jsonString = await rootBundle.loadString('assets/data/user.json');
-    Map<String, dynamic> jsonData = json.decode(jsonString);
-
-    // Lấy danh sách tutors từ dữ liệu JSON
-    Map<String, dynamic> userJson = {};
-
-    if (jsonData['user'] != null) {
-      userJson = Map<String, dynamic>.from(jsonData['user']);
-    }
-    print(userJson);
-    userData=User.fromJson(userJson);
-  }
+  // Future<void> loadUser() async {
+  //   // Đọc dữ liệu từ file JSON
+  //   User data;
+  //   String jsonString = await rootBundle.loadString('assets/data/user.json');
+  //   Map<String, dynamic> jsonData = json.decode(jsonString);
+  //
+  //   // Lấy danh sách tutors từ dữ liệu JSON
+  //   Map<String, dynamic> userJson = {};
+  //
+  //   if (jsonData['user'] != null) {
+  //     userJson = Map<String, dynamic>.from(jsonData['user']);
+  //   }
+  //   print(userJson);
+  //   userData=User.fromJson(userJson);
+  // }
 
   Future<void> loadCourse() async {
     // Đọc dữ liệu từ file JSON
@@ -132,7 +131,6 @@ class _MyAppState extends State<MyApp> {
         Provider(create: (context)=>listCourse),
         ChangeNotifierProvider(create: (context) => favouriteRepository),
         ChangeNotifierProvider(create: (context)=> mySchedule),
-        ChangeNotifierProvider(create: (context)=>userData)
       ],
       child: MaterialApp(
           title: 'LetTutor',

@@ -87,6 +87,7 @@ class TutorRepository extends BaseRepository {
     required Function(List<TutorModel>, int) onSuccess,
     required Function(String) onFail,
   }) async {
+    print(nationality);
     final response = await service.post(url: "search", data: {
       "filters": {
         "specialties": speciality,
@@ -95,7 +96,7 @@ class TutorRepository extends BaseRepository {
         "tutoringTimeAvailable": [null, null]
       },
       "search": searchKeys,
-      "page": "$page",
+      "page": '$page',
       "perPage": 10
     }, headers: {
       "Authorization": "Bearer $accessToken"
@@ -123,4 +124,5 @@ class TutorRepository extends BaseRepository {
 
     await onSuccess();
   }
+
 }

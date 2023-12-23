@@ -7,12 +7,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import '../../Provider/auth_provider.dart';
 import '../../repository/favorite-repository.dart';
+import '../../services/user.api.dart';
+import 'Home.dart';
 
 class Tutor extends StatefulWidget {
-  const Tutor(this.tutor, this.isFavorite, {super.key});
+  const Tutor(this.tutor, this.isFavorite , this.changeFavorite,{super.key});
   final TutorModel tutor;
   final bool isFavorite;
+  final ChangeFavorite changeFavorite;
 
   @override
   State<Tutor> createState() => _TutorState();
@@ -75,12 +79,10 @@ List<Widget> generateRatings(double rating) {
 }
 
 class _TutorState extends State<Tutor> {
+
   @override
   Widget build(BuildContext context) {
-    FavouriteRepository favouriteRepository =
-        context.watch<FavouriteRepository>();
-    var isInFavourite =
-        favouriteRepository.itemIds.contains(widget.tutor.userId);
+    var authProvider = Provider.of<AuthProvider>(context);
     List<Widget> generatedWidgets =
         generateWidgets(widget.tutor.specialties?.split(',') ?? []);
     return Container(
@@ -173,8 +175,7 @@ class _TutorState extends State<Tutor> {
                   color: widget.isFavorite ? Colors.red : Colors.blueAccent,
                 ),
                 onPressed: () {
-                  // Handle icon click here
-                  //isInFavourite?favouriteRepository.remove(widget.tutor.userId):favouriteRepository.add(widget.tutor.userId);
+                  callApiManageFavoriteTutor( widget.tutor.userId!,authProvider);
                 },
               )
             ],
@@ -244,5 +245,32 @@ class _TutorState extends State<Tutor> {
         ],
       ),
     );
+  }
+  Future<void> callApiManageFavoriteTutor(
+      String tutorID, AuthProvider authProvider) async {
+    UserRepository userRepository = UserRepository();
+    await userRepository.favoriteTutor(
+        accessToken: authProvider.token?.access?.token ?? "",
+        tutorId: tutorID!,
+        onSuccess: (message, unfavored) async {
+          setState(() {
+            widget.changeFavorite(tutorID);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              content: Text("Update favorite tutor successful",style: TextStyle(
+                color: Colors.white
+              ),),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
   }
 }

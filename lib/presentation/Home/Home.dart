@@ -1,26 +1,32 @@
 import 'dart:async';
 
 import 'package:advanced_mobileapp_development/model/schedule-dto.dart';
-import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
+import 'package:advanced_mobileapp_development/presentation/VideoCall/JoinComingLesson.dart';
 import 'package:advanced_mobileapp_development/presentation/VideoCall/VideoCallPage.dart';
 import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:flutter_pagination/flutter_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
+import '../../model/schedule/booking_infor.dart';
 import '../../model/tutor/tutor_model.dart';
 import '../../responses/list_tutor_response.dart';
+import '../../services/booking.api.dart';
 import '../../services/tutors.api.dart';
+import '../../styles/styles.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(
     String filter, String nameTutor, List<String> nation);
+typedef ChangeFavorite = void Function(String tutorId);
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -30,14 +36,24 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<TutorModel> _tutorList = [];
+  List<BookingInfo> lessonList = [];
+
   List<String> _favTutorsId = [];
 
+  int currentPage = 1;
+  int maxPage = 1;
 
-  bool isLoading=true;
+  bool isLoading = true;
   //Đã call api này chưa
   bool hasCallAPI = false;
 
-
+  //Upcoming
+  String totalLessonTime = "";
+  BookingInfo? upcomingLesson;
+  //search
+  String specialities = 'all';
+  String nameTutor = "";
+  Map<String, dynamic> national = {};
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
@@ -47,83 +63,84 @@ class _HomeState extends State<Home> {
     if (!hasCallAPI) {
       await Future.wait([
         callAPIGetTutorList(1, TutorRepository(), authProvider),
-        //callApiGetListSchedules(BookingRepository(), authProvider)
+        callApiGetListSchedules(BookingRepository(), authProvider)
       ]).whenComplete(() {
         if (mounted) {
           setState(() {
             hasCallAPI = true;
-            isLoading=false;
+            isLoading = false;
           });
         }
       });
     }
   }
 
-  void filterCallback(String filter, String nameTutor, List<String> nation) {
-
-
-    // List<TutorDTO> temp = [];
-    // if (filter == "All") {
-    //   temp = tutors;
-    // } else {
-    //   temp =
-    //       tutors.where((tutor) => tutor.specialties.contains(filter)).toList();
-    // }
-    //
-    // if (!nation.isEmpty) {
-    //   List<TutorDTO> filterOfNation = [];
-    //   nation.forEach((element) {
-    //     if (element == "Foreign Tutor") {
-    //       filterOfNation = filterOfNation +
-    //           temp
-    //               .where((tutor) =>
-    //                   !tutor.country.contains("US") &&
-    //                   !tutor.country.contains("England") &&
-    //                   !tutor.country.contains("Vietnam"))
-    //               .toList();
-    //     } else if (element == "Vietnamese Tutor") {
-    //       filterOfNation = filterOfNation +
-    //           temp.where((tutor) => tutor.country.contains("Vietnam")).toList();
-    //     } else if (element == "Native English Tutor") {
-    //       filterOfNation = filterOfNation +
-    //           temp
-    //               .where((tutor) =>
-    //                   tutor.country.contains("US") ||
-    //                   tutor.country.contains("England"))
-    //               .toList();
-    //     }
-    //   });
-    //   temp = filterOfNation;
-    // }
-    // temp = temp
-    //     .where((tutor) =>
-    //         tutor.name.toLowerCase().contains(nameTutor.toLowerCase()))
-    //     .toList();
-    //
-    // setState(() {
-    //   tutorsFilter = temp;
-    // });
-  }
-
   Future<void> refreshHome(AuthProvider authProvider) async {
     setState(() {
-       _tutorList= [];
-       _favTutorsId = [];
-       isLoading = true;
+      _tutorList = [];
+      _favTutorsId = [];
+      lessonList = [];
+      isLoading = true;
     });
     await Future.wait([
       callAPIGetTutorList(1, TutorRepository(), authProvider),
-     // callApiGetListSchedules(BookingRepository(), authProvider)
+      callApiGetListSchedules(BookingRepository(), authProvider)
     ]).whenComplete(() {
       setState(() {
-        isLoading= false;
+        isLoading = false;
       });
       return Future<void>.delayed(const Duration(seconds: 0));
+    });
+  }
+  void changeFavorite(String idTutor)
+  {
+    List<String> favoriteList=_favTutorsId;
+    if (favoriteList.contains(idTutor)) {
+
+      favoriteList.remove(idTutor);
+    } else {
+      favoriteList.add(idTutor!);
+      favoriteList = favoriteList.toSet().toList();
+    }
+
+    setState(() {
+      _favTutorsId=favoriteList;
     });
   }
   @override
   Widget build(BuildContext context) {
     var authProvider = Provider.of<AuthProvider>(context);
+
+    void filterCallback(String filter, String nameTutor, List<String> nation) {
+
+      Map<String, dynamic> nationality = {
+        "isVietNamese": false,
+        "isNative": false
+      };
+      if (nation.isEmpty || nation.length == 3) {
+        nationality = {};
+      } else {
+        nation.forEach((String item) {
+          switch (item) {
+            case "Vietnamese Tutor":
+              nationality["isVietNamese"] = true;
+              break;
+            case "Native English Tutor":
+              nationality["isNative"] = true;
+              break;
+          }
+        });
+      }
+      nationality.removeWhere((key, value) => value == true);
+
+      setState(() {
+        specialities = filter;
+        nameTutor = nameTutor;
+        national = nationality;
+      });
+
+      searchTutor(currentPage, TutorRepository(), authProvider,filter=="all"?"":filter,nameTutor,nationality);
+    }
 
     return Scaffold(
         endDrawer: Drawer(
@@ -317,7 +334,7 @@ class _HomeState extends State<Home> {
           child: SingleChildScrollView(
               child: Container(
                   child: Column(children: [
-           // UpcomingLesson(mySchedule: mySchedule),
+            UpcomingLesson(upcominglesson: upcomingLesson!,totalLessonTime: totalLessonTime,),
             SearchTutor(filterCallback),
             Divider(
               // Add a horizontal line
@@ -327,11 +344,31 @@ class _HomeState extends State<Home> {
               indent: 20, // Line indent on the left
               endIndent: 10, // Line indent on the right
             ),
-            ListTutors(_tutorList,_favTutorsId),
+            ListTutors(_tutorList, _favTutorsId,changeFavorite),
+            Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(16),
+                child: Pagination(
+                  paginateButtonStyles: paginationStyle(context),
+                  prevButtonStyles: prevButtonStyles(context),
+                  nextButtonStyles: nextButtonStyles(context),
+                  onPageChange: (number) {
+                    setState(() {
+                      isLoading = true;
+                      currentPage = number;
+                    });
+                    //Call API
+                    searchTutor(number, TutorRepository(), authProvider,specialities,nameTutor,national);
+                  },
+                  useGroup: false,
+                  totalPage: maxPage,
+                  show: maxPage-1,
+                  currentPage: currentPage,
+                ))
           ]))),
         ));
-
   }
+
   Future<void> callAPIGetTutorList(int page, TutorRepository tutorRepository,
       AuthProvider authProvider) async {
     await tutorRepository.getListTutor(
@@ -348,21 +385,59 @@ class _HomeState extends State<Home> {
         });
   }
 
-  // Future<void> searchTutor(String filter, String nameTutor, List<String> nation,TutorRepository tutorRepository,
-  //     AuthProvider authProvider) async {
-  //   await tutorRepository.searchTutor(
-  //        accessToken:authProvider.token!.access!.token??"" ,
-  //       page: 1,
-  //        nationality:nation ,
-  //       // onSuccess: (response) async {
-  //       //   _handleTutorListDataFromAPI(response);
-  //       // },
-  //       onFail: (error) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text('Error: ${error.toString()}')),
-  //         );
-  //       });
-  // }
+  Future<void> callApiGetListSchedules(
+      BookingRepository bookingRepository, AuthProvider authProvider) async {
+    await bookingRepository.getIncomingLessons(
+        accessToken: authProvider.token?.access?.token ?? "",
+        page: 1,
+        perPage: 100000,
+        now: DateTime.now().millisecondsSinceEpoch.toString(),
+        onSuccess: (response, total) async {
+          _filterListScheduleFromApi(response);
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
+
+
+  int getShowPagesBasedOnPages(int pages) {
+    if (pages > 2) {
+      return 2;
+    } else if (pages == 2) {
+      return 1;
+    } else if (pages <= 1) {
+      return 0;
+    } else {
+      return 0;
+    }
+  }
+
+  Future<void> searchTutor(int page, TutorRepository tutorRepository,
+      AuthProvider authProvider, String filter, String name, Map<String,dynamic> nationality) async {
+    await tutorRepository.searchTutor(
+        accessToken: authProvider.token!.access!.token ?? "",
+        page: page,
+        searchKeys: name,
+        speciality: [filter],
+        nationality: nationality,
+        onSuccess: (response, total) async {
+          _tutorList = [];
+          _tutorList.addAll(response);
+          setState(() {
+            isLoading = false;
+            currentPage = page;
+            maxPage = (total / 10).ceil();
+          });
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
 
   void _handleTutorListDataFromAPI(ResponseGetListTutor response) {
     response.favoriteTutor?.forEach((element) {
@@ -390,6 +465,7 @@ class _HomeState extends State<Home> {
     _tutorList.addAll(favoredList);
     _tutorList.addAll(notFavoredList);
   }
+
   bool checkIfTutorIsFavorite(TutorModel tutor) {
     for (var element in _favTutorsId) {
       if (element == tutor.userId) return true;
@@ -397,102 +473,55 @@ class _HomeState extends State<Home> {
     return false;
   }
 
+  void _filterListScheduleFromApi(List<BookingInfo> listBooking) {
+    for (var value in listBooking) {
+      if (value.isDeleted != true) {
+        lessonList.insert(0, value);
+      }
+    }
+
+    //Calculate total learning time
+    DateTime totalTime = DateTime.now();
+    DateTime nowTime = totalTime;
+    for (var element in lessonList) {
+      var startTime = DateTime.fromMillisecondsSinceEpoch(
+          element.scheduleDetailInfo!.startPeriodTimestamp!);
+      var endTime = DateTime.fromMillisecondsSinceEpoch(
+          element.scheduleDetailInfo!.endPeriodTimestamp!);
+      var learningDuration = endTime.difference(startTime);
+      totalTime = totalTime.add(learningDuration);
+    }
+    Duration learningDuration = totalTime.difference(nowTime);
+
+    if (lessonList.isNotEmpty) {
+      upcomingLesson = lessonList.first;
+      totalLessonTime = _printDuration(learningDuration);
+    }
+  }
+  String _printDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
 }
 
 class UpcomingLesson extends StatefulWidget {
-  const UpcomingLesson({required this.mySchedule, super.key});
-  final MyScheduleChangeNotifier mySchedule;
+  const UpcomingLesson({required this.upcominglesson,required this.totalLessonTime, super.key});
+  final BookingInfo upcominglesson;
+  final String totalLessonTime;
 
   @override
   State<UpcomingLesson> createState() => _UpcomingLessonState();
 }
 
-class _UpcomingLessonState extends State<UpcomingLesson>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+class _UpcomingLessonState extends State<UpcomingLesson> {
 
-  int? timestamp;
-  int? endstamp;
-  late DateTime targetTime;
-  late Timer countdownTimer;
-  Duration remainingTime = Duration.zero;
-
-  ScheduleDTO? upcomingLesson = null;
-
-  bool compareTime(int time1, int time2) {
-    DateTime dateTime1 = DateTime.fromMillisecondsSinceEpoch(time1);
-    DateTime dateTime2 = DateTime.fromMillisecondsSinceEpoch(time2);
-
-    // Thời điểm hiện tại
-    DateTime now = DateTime.now();
-
-    // Tính khoảng cách thời gian từ mỗi timestamp đến thời điểm hiện tại
-    Duration difference1 = dateTime1.difference(now).abs();
-    Duration difference2 = dateTime2.difference(now).abs();
-
-    // So sánh khoảng cách thời gian
-    if (difference1 < difference2) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void updateRemainingTime() {
-    DateTime now = DateTime.now();
-    setState(() {
-      remainingTime =
-          targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.mySchedule.mySchedule.length != 0) {
-      upcomingLesson = widget.mySchedule.mySchedule.reduce(
-          (current, schedule) =>
-              compareTime(schedule.startTimestamp, current.startTimestamp)
-                  ? schedule
-                  : current);
-
-      timestamp = upcomingLesson?.startTimestamp;
-      endstamp = upcomingLesson?.endTimestamp;
-      targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp!);
-      DateTime now = DateTime.now();
-      remainingTime =
-          targetTime.isAfter(now) ? targetTime.difference(now) : Duration.zero;
-
-      countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-        updateRemainingTime();
-
-        if (remainingTime <= Duration.zero) {
-          timer.cancel();
-        }
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    countdownTimer.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     Color backgroundColor = Color.fromARGB(255, 12, 61, 223);
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    if (widget.mySchedule.mySchedule.length != 0) {
-      hours = remainingTime.inHours;
-      minutes = (remainingTime.inMinutes % 60);
-      seconds = (remainingTime.inSeconds % 60);
-    }
+
 
     String convertTimeToString(int time1, int time2) {
       DateTime timestart = DateTime.fromMillisecondsSinceEpoch(time1);
@@ -513,17 +542,17 @@ class _UpcomingLessonState extends State<UpcomingLesson>
       child: Column(
         children: [
           Text(
-            widget.mySchedule.mySchedule.length == 0
+            widget.upcominglesson == null
                 ? "You have no upcoming lesson."
                 : "Upcoming lesson",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 22, color: Colors.white),
           ),
           SizedBox(
-            height: widget.mySchedule.mySchedule.length != 0 ? 20 : 0,
+            height: widget.upcominglesson != null ? 20 : 0,
           ),
           Visibility(
-            visible: widget.mySchedule.mySchedule.length != 0,
+            visible: widget.upcominglesson != null,
             child: Row(
               children: [
                 Expanded(
@@ -533,20 +562,20 @@ class _UpcomingLessonState extends State<UpcomingLesson>
                       Text(
                         DateFormat('EEEE, MMMM d').format(
                             DateTime.fromMillisecondsSinceEpoch(
-                                timestamp != null ? timestamp! : 0)),
+                                widget.upcominglesson!= null ? widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp! : 0)),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       Text(
-                        convertTimeToString(timestamp != null ? timestamp! : 0,
-                            endstamp != null ? endstamp! : 0),
+                        convertTimeToString(widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp!= null ? widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp! : 0,
+                            widget.upcominglesson.scheduleDetailInfo!.endPeriodTimestamp!= null ? widget.upcominglesson.scheduleDetailInfo!.endPeriodTimestamp! : 0),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
-                      Text(
-                        "Start in ($hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')})",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.yellow),
+                      CountdownTimer(
+                        endTime: widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp!,
+                        textStyle: TextStyle(color: Colors.yellow),
+
                       ),
                     ],
                   ),
@@ -569,7 +598,7 @@ class _UpcomingLessonState extends State<UpcomingLesson>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => VideoCallPage()),
+                              builder: (context) => JoinMeetingPage(upcomingClass: widget.upcominglesson)),
                         );
                       },
                       child: Row(
@@ -596,7 +625,9 @@ class _UpcomingLessonState extends State<UpcomingLesson>
             height: 20,
           ),
           Text(
-            "Total lesson time is 0 hours 0 minutes",
+            (widget.totalLessonTime.isEmpty)
+                ? "Total lesson time is 0"
+                : "Total lesson time is: ${widget.totalLessonTime}",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
@@ -607,6 +638,3 @@ class _UpcomingLessonState extends State<UpcomingLesson>
     );
   }
 }
-
-
-

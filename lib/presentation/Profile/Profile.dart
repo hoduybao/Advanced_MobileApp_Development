@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:advanced_mobileapp_development/model/user-dto.dart';
+import 'package:advanced_mobileapp_development/model/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,7 +24,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late User userData;
+  late UserModel userData;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
@@ -127,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void initValues(User userData) {
+  void initValues(UserModel userData) {
     setState(() {
       nameController.text = userData.name ?? "";
       emailController.text = userData.email ?? "";
@@ -187,7 +187,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    userData = context.watch<User>();
 
     if (hasInitValue == false) {
       initValues(userData);
@@ -349,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildForm(User userData) {
+  Widget _buildForm(UserModel userData) {
     return Container(
       margin: EdgeInsets.all(20),
       child: Form(
@@ -449,13 +448,13 @@ class _ProfilePageState extends State<ProfilePage> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           // Update user info
-          User updatedUser = userData;
+          UserModel updatedUser = userData;
           updatedUser.name = nameController.text;
           updatedUser.country = selectedCountry;
           updatedUser.birthday = DateFormat('yyyy-MM-dd').format(selectedDate);
           updatedUser.level = selectedLevel;
           updatedUser.studySchedule = studyScheduleController.text;
-          userData.updateData(updatedUser);
+          //userData.updateData(updatedUser);
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

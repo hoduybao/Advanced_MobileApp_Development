@@ -358,6 +358,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
+  flutter_countdown_timer:
+    dependency: "direct main"
+    description:
+      name: flutter_countdown_timer
+      sha256: dfcbd7d6f76a5589f78f3f3ba2f9ea2e199368eccc1adce4153ce985b9587bc5
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -367,10 +375,18 @@ packages:
     source: hosted
     version: "2.0.3"
   flutter_localizations:
-    dependency: transitive
+    dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_pagination:
+    dependency: "direct main"
+    description:
+      name: flutter_pagination
+      sha256: f3d7c73b274231877673dcb184340cca46f0c4d9fd7da88e1000654a97857d48
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -557,6 +573,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  jitsi_meet_wrapper:
+    dependency: "direct main"
+    description:
+      name: jitsi_meet_wrapper
+      sha256: cf678a95e6bf817765d974155c21303355e2c20e470f5516e09fffaef3458e8d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0+1"
+  jitsi_meet_wrapper_platform_interface:
+    dependency: transitive
+    description:
+      name: jitsi_meet_wrapper_platform_interface
+      sha256: "7939f7c5ae8365a7fb82618de7d68f28e85d5e6f995e885f1c732cda1b83b988"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   js:
     dependency: transitive
     description:
@@ -581,6 +613,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.7.1"
+  jwt_decoder:
+    dependency: "direct main"
+    description:
+      name: jwt_decoder
+      sha256: "54774aebf83f2923b99e6416b4ea915d47af3bde56884eb622de85feabbc559f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   lints:
     dependency: transitive
     description:

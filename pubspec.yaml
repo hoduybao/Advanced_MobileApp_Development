@@ -46,7 +46,15 @@ dependencies:
   intl: ^0.18.1
   babstrap_settings_screen: ^0.1.6
   image_picker: ^1.0.4
+  flutter_pagination: ^0.0.8
+  flutter_countdown_timer: ^4.1.0
 
+  jwt_decoder: ^2.0.1
+  jitsi_meet_wrapper: ^0.2.0+1
+
+  #Localizations
+  flutter_localizations:
+    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.

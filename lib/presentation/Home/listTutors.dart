@@ -3,12 +3,14 @@ import 'package:advanced_mobileapp_development/presentation/Home/tutor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'Home.dart';
+
 class ListTutors extends StatefulWidget {
 
-  const ListTutors(this.tutors,this._favTutorsId, {super.key});
+  const ListTutors(this.tutors,this._favTutorsId,this.changeFavorite, {super.key});
   final List<TutorModel> tutors;
   final List<String> _favTutorsId;
-
+ final ChangeFavorite changeFavorite;
 
   @override
   State<ListTutors> createState() => _ListTutorsState();
@@ -45,7 +47,7 @@ class _ListTutorsState extends State<ListTutors> {
               shrinkWrap: true,
               itemCount: widget.tutors.length,
               itemBuilder: (context, index) {
-                return Tutor(widget.tutors[index],checkIfTutorIsFavorite(widget.tutors[index]));
+                return Tutor(widget.tutors[index],checkIfTutorIsFavorite(widget.tutors[index]),widget.changeFavorite);
                   // Add more customization here if needed
               },
             ),

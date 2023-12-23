@@ -1,14 +1,9 @@
-import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/model/tutor/tutor_model.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/DetailTutor.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
-import '../../repository/favorite-repository.dart';
 import '../../services/user.api.dart';
 import 'Home.dart';
 
@@ -111,12 +106,12 @@ class _TutorState extends State<Tutor> {
               Row(
                 children: [
                   GestureDetector(
-                    // onTap: () {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(builder: (context) => DetailTutor(widget.tutor)),
-                    //   );
-                    // },
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DetailTutor(widget.tutor,widget.changeFavorite)),
+                      );
+                    },
                     child: Container(
                       width: 65, // Đặt chiều rộng của container
                       height: 65, // Đặt chiều cao của container

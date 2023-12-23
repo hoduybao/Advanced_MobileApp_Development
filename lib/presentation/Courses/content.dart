@@ -1,9 +1,8 @@
-import 'package:advanced_mobileapp_development/model/course-dto.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/listBook.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/listCourse.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 
 class Content extends StatefulWidget {
   const Content({super.key});
@@ -14,10 +13,9 @@ class Content extends StatefulWidget {
 
 class _ContentState extends State<Content> {
   int isActived=1;
+
   @override
   Widget build(BuildContext context) {
-    List<CourseDTO> courses = context.watch<List<CourseDTO>>();
-    print("hello "+ courses.length.toString());
 
     return Container(
       margin: EdgeInsets.only(top: 20),
@@ -122,4 +120,5 @@ class _ContentState extends State<Content> {
       ),
     );
   }
+
 }

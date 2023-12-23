@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
+import 'package:advanced_mobileapp_development/Provider/course_provider.dart';
 import 'package:advanced_mobileapp_development/model/account-dto.dart';
 import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
@@ -30,8 +31,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Account account = Account(email: "", password: "");
+
   AuthProvider authProvider=AuthProvider();
+  CourseProvider courseProvider=CourseProvider();
   List<TutorDTO> listTutor=[];
   List<CourseDTO> listCourse=[];
 
@@ -126,9 +128,9 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context)=>authProvider),
-        ChangeNotifierProvider(create: (context) => account),
         Provider(create: (context)=>listTutor),
         Provider(create: (context)=>listCourse),
+        ChangeNotifierProvider(create: (context)=>courseProvider),
         ChangeNotifierProvider(create: (context) => favouriteRepository),
         ChangeNotifierProvider(create: (context)=> mySchedule),
       ],

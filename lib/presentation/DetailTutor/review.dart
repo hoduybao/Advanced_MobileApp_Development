@@ -1,4 +1,5 @@
 import 'package:advanced_mobileapp_development/model/feedback-dto.dart';
+import 'package:advanced_mobileapp_development/model/tutor/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,8 +9,29 @@ import '../../model/rate-dto.dart';
 class Review extends StatelessWidget {
 
   const Review(this.rate,{super.key});
-  final FeedbackDTO rate;
+  final TutorFeedback rate;
 
+  String formatTimeAgo(String apiTime) {
+    DateTime currentTime = DateTime.now();
+    DateTime apiDateTime = DateTime.parse(apiTime);
+    Duration difference = currentTime.difference(apiDateTime);
+
+    if (difference.inDays >= 365) {
+      int years = (difference.inDays / 365).floor();
+      return '$years ${years == 1 ? 'year' : 'years'} ago';
+    } else if (difference.inDays >= 30) {
+      int months = (difference.inDays / 30).floor();
+      return '$months ${months == 1 ? 'month' : 'months'} ago';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays} ${difference.inDays == 1 ? 'day' : 'days'} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} ${difference.inHours == 1 ? 'hour' : 'hours'} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'minute' : 'minutes'} ago';
+    } else {
+      return 'Just now';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,7 +49,7 @@ class Review extends StatelessWidget {
             ),
             child: ClipOval(
               child: Image.network(
-                  rate.firstInfo.avatar,width: 50,height: 50,), // Thay thế bằng hình ảnh của bạn
+                  rate.firstInfo!.avatar!,width: 50,height: 50,), // Thay thế bằng hình ảnh của bạn
             ),
           ),
           SizedBox(
@@ -39,11 +61,11 @@ class Review extends StatelessWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: rate.firstInfo.name,
+                    text: rate.firstInfo!.name,
                     style: TextStyle(
                         color: Colors.grey.shade600, fontSize: 16,fontWeight: FontWeight.normal),
                     children:  <TextSpan>[
-                      TextSpan(text:"   "+  rate.updatedAt, style: TextStyle(color: Colors.grey.shade400)),
+                      TextSpan(text:"   "+  formatTimeAgo(rate.updatedAt!) , style: TextStyle(color: Colors.grey.shade400)),
 
                     ],
                   ),
@@ -51,11 +73,11 @@ class Review extends StatelessWidget {
                 SizedBox(height: 5,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: generateWidgets(rate.rating),
+                  children: generateWidgets(rate.rating!),
                 ),
                 SizedBox(height: 2,),
 
-                Text(rate.content)
+                Text(rate.content!)
               ],
             ),
         ],

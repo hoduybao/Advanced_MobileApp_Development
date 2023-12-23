@@ -1,13 +1,9 @@
 import 'dart:async';
 
-import 'package:advanced_mobileapp_development/model/schedule-dto.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
-import 'package:advanced_mobileapp_development/presentation/VideoCall/JoinComingLesson.dart';
-import 'package:advanced_mobileapp_development/presentation/VideoCall/VideoCallPage.dart';
-import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
@@ -595,11 +591,11 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => JoinMeetingPage(upcomingClass: widget.upcominglesson)),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => JoinMeetingPage(upcomingClass: widget.upcominglesson)),
+                        // );
                       },
                       child: Row(
                         children: [

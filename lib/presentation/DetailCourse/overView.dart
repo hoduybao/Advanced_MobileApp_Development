@@ -1,4 +1,6 @@
 import 'package:advanced_mobileapp_development/model/course-dto.dart';
+import 'package:advanced_mobileapp_development/model/course/course_model.dart';
+import 'package:advanced_mobileapp_development/model/course/topic.dart';
 import 'package:advanced_mobileapp_development/model/topic-dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import 'package:flutter/material.dart';
 import '../DetailLesson/lesson.dart';
 
 class OverView extends StatefulWidget {
-  final CourseDTO course;
+  final CourseModel course;
   const OverView({super.key,required this.course});
 
   @override
@@ -17,7 +19,7 @@ class _OverViewState extends State<OverView> {
   @override
   Widget build(BuildContext context) {
 
-    List<Topic> topics=widget.course.topics;
+    List<CourseTopic> topics=widget.course!.topics!;
     return Column(
       children: [
         Row(
@@ -75,7 +77,7 @@ class _OverViewState extends State<OverView> {
         Container(
           padding: EdgeInsets.only(left: 30),
           child: Text(
-    widget.course.reason
+    widget.course.reason!
             ,
             style: TextStyle(color: Colors.grey.shade700),
           ),
@@ -108,7 +110,7 @@ class _OverViewState extends State<OverView> {
         ),
         Container(
           padding: EdgeInsets.only(left: 30),
-          child: Text(    widget.course.purpose,
+          child: Text(    widget.course.purpose!,
           style: TextStyle(color: Colors.grey.shade700),
           ),
         ),
@@ -152,7 +154,7 @@ class _OverViewState extends State<OverView> {
               width: 10,
             ),
             Text(
-              widget.course.level,
+              widget.course.level!,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             )
           ],
@@ -231,7 +233,7 @@ class _OverViewState extends State<OverView> {
         ListView(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            children:generateWidgets(topics)),
+            children:generateWidgets(topics!)),
         SizedBox(height: 15),
         Row(
           children: <Widget>[
@@ -282,7 +284,7 @@ class _OverViewState extends State<OverView> {
     );
   }
 
-  List<Widget> generateWidgets(List<Topic> list) {
+  List<Widget> generateWidgets(List<CourseTopic> list) {
     List<Widget> widgets = [];
 
     for (int i = 0; i < list.length; i++) {
@@ -291,7 +293,7 @@ class _OverViewState extends State<OverView> {
           // Handle the onTap event here
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>  Lesson(title: list[i].name, url: list[i].nameFile)),
+            MaterialPageRoute(builder: (context) =>  Lesson(title: list[i].name!, url: list[i].nameFile!)),
           );
         },
         child: Container(
@@ -309,7 +311,7 @@ class _OverViewState extends State<OverView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text((i+1).toString()+"."),
-              Text(list[i].name),
+              Text(list[i].name!),
             ],
           ),
         ),

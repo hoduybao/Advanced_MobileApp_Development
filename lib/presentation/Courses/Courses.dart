@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/filter.dart';
@@ -9,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 
 import '../Schedule/Schedule.dart';
 import 'content.dart';
@@ -22,9 +22,9 @@ class Courses extends StatefulWidget {
 
 class _CoursesState extends State<Courses> {
 
+
   @override
   Widget build(BuildContext context) {
-
 
     return Scaffold(
       endDrawer: Drawer(

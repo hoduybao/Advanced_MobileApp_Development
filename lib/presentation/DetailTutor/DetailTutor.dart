@@ -1,29 +1,38 @@
 import 'dart:convert';
 
 import 'package:advanced_mobileapp_development/model/tutor.dart';
+import 'package:advanced_mobileapp_development/model/tutor/tutor_model.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/booking.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/infoDetail.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/listReview.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/videoIntro.dart';
+import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:provider/provider.dart';
 
+import '../../Provider/auth_provider.dart';
+import '../../common/loading.dart';
 import '../../model/schedule-dto.dart';
+import '../../model/tutor/infor.dart';
 import '../../repository/favorite-repository.dart';
+import '../../services/tutors.api.dart';
 
 
 class DetailTutor extends StatefulWidget {
-  const DetailTutor(this.tutor,{super.key});
-  final TutorDTO tutor;
+  const DetailTutor(this.tutor,this.changeFavorite,{super.key});
+  final TutorModel tutor;
+  final ChangeFavorite changeFavorite;
   @override
   State<DetailTutor> createState() => _DetailTutorState();
 }
 
 class _DetailTutorState extends State<DetailTutor> {
-  bool isFavorite=false;
+  late TutorModel tutorData;
+  late TutorInfo tutorInfo;
+  bool isCallApi = false;
 
   List<Widget> generateRatings(double rating) {
     int realRating=rating.toInt();
@@ -51,9 +60,21 @@ class _DetailTutorState extends State<DetailTutor> {
   }
 
   @override
+  void initState() {
+    tutorData = widget.tutor;
+    super.initState();
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isCallApi) {
+      callAPIGetTutorById(TutorRepository(),
+          Provider.of<AuthProvider>(context, listen: false), tutorData.userId);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    FavouriteRepository favouriteRepository = context.watch<FavouriteRepository>();
-    var isInFavourite = favouriteRepository.itemIds.contains(widget.tutor.userId);
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
@@ -99,7 +120,8 @@ class _DetailTutorState extends State<DetailTutor> {
             // Replace 'assets/icon.png' with your image path
           ),
         ),
-        body: SingleChildScrollView(
+        body:!isCallApi
+            ? Loading(): SingleChildScrollView(
             child: Container(
 
                 padding: EdgeInsets.all(25),
@@ -118,7 +140,7 @@ class _DetailTutorState extends State<DetailTutor> {
                         ),
                         child: ClipOval(
                           child: Image.network(
-                              widget.tutor.avatar,), // Thay thế bằng hình ảnh của bạn
+                              tutorData.avatar!,),
                         ),
                       ),
                       SizedBox(
@@ -129,7 +151,7 @@ class _DetailTutorState extends State<DetailTutor> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            widget.tutor.name,
+                            tutorData.name!,
                             style: TextStyle(
                                 fontWeight: FontWeight.w500, fontSize: 22),
                           ),
@@ -138,7 +160,7 @@ class _DetailTutorState extends State<DetailTutor> {
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: generateRatings(widget.tutor.rating!=null?widget.tutor.rating:0.0)
+                            children: generateRatings(tutorData.rating!=null?tutorData.rating!:0.0)
                           ),
                           SizedBox(
                             height: 10,
@@ -154,7 +176,7 @@ class _DetailTutorState extends State<DetailTutor> {
                                 width: 3,
                               ),
                               Text(
-                                widget.tutor.country,
+                                tutorData.country!,
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black54,
@@ -171,7 +193,7 @@ class _DetailTutorState extends State<DetailTutor> {
                   ),
 
                   ExpandableText(
-                    widget.tutor.bio,
+                    tutorInfo.bio!,
                       expandText: 'More',
                       collapseText: 'Less',
                       maxLines:
@@ -190,17 +212,16 @@ class _DetailTutorState extends State<DetailTutor> {
                         children: [
                           IconButton(
                               onPressed: () {
-                                isInFavourite?favouriteRepository.remove(widget.tutor.userId):favouriteRepository.add(widget.tutor.userId);
-
+                                widget.changeFavorite(tutorData.userId!);
                               },
                               icon: Icon(
-                                isInFavourite?Icons.favorite:Icons.favorite_border,
-                                color: isInFavourite?Colors.red:Colors.blueAccent,
+                                tutorInfo.isFavorite!?Icons.favorite:Icons.favorite_border,
+                                color: tutorInfo.isFavorite!?Colors.red:Colors.blueAccent,
                                 size: 25,
                               )),
                           Text(
                             "Favorite",
-                            style: TextStyle(color:isInFavourite?Colors.red: Colors.blueAccent),
+                            style: TextStyle(color:tutorInfo.isFavorite!?Colors.red: Colors.blueAccent),
                           )
                         ],
                       ),
@@ -226,13 +247,30 @@ class _DetailTutorState extends State<DetailTutor> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  ChewieDemo(linkVideo: widget.tutor.video,),
-                  InfoDetail(widget.tutor),
+                  ChewieDemo(linkVideo: tutorInfo.video!),
+                  InfoDetail(tutorInfo!),
                   SizedBox(height: 20),
-                  ListReview(widget.tutor.feedbacks),
+                  ListReview(tutorData.feedbacks!),
                   SizedBox(height: 20),
                   Booking()
                 ]))));
+  }
+  Future<void> callAPIGetTutorById(TutorRepository tutorRepository,
+      AuthProvider authProvider, String? userId) async {
+    await tutorRepository.getTutorById(
+        accessToken: authProvider.token?.access?.token ?? "",
+        tutorId: userId ?? "",
+        onSuccess: (response) async {
+          setState(() {
+            tutorInfo = response;
+            isCallApi = true;
+          });
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
   }
 }
 

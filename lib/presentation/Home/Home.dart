@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
 
   //Upcoming
   String totalLessonTime = "";
-  BookingInfo? upcomingLesson;
+  BookingInfo upcomingLesson = new BookingInfo();
   //search
   String specialities = 'all';
   String nameTutor = "";
@@ -88,11 +88,10 @@ class _HomeState extends State<Home> {
       return Future<void>.delayed(const Duration(seconds: 0));
     });
   }
-  void changeFavorite(String idTutor)
-  {
-    List<String> favoriteList=_favTutorsId;
-    if (favoriteList.contains(idTutor)) {
 
+  void changeFavorite(String idTutor) {
+    List<String> favoriteList = _favTutorsId;
+    if (favoriteList.contains(idTutor)) {
       favoriteList.remove(idTutor);
     } else {
       favoriteList.add(idTutor!);
@@ -100,15 +99,15 @@ class _HomeState extends State<Home> {
     }
 
     setState(() {
-      _favTutorsId=favoriteList;
+      _favTutorsId = favoriteList;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     var authProvider = Provider.of<AuthProvider>(context);
 
     void filterCallback(String filter, String nameTutor, List<String> nation) {
-
       Map<String, dynamic> nationality = {
         "isVietNamese": false,
         "isNative": false
@@ -135,7 +134,8 @@ class _HomeState extends State<Home> {
         national = nationality;
       });
 
-      searchTutor(currentPage, TutorRepository(), authProvider,filter=="all"?"":filter,nameTutor,nationality);
+      searchTutor(currentPage, TutorRepository(), authProvider,
+          filter == "all" ? "" : filter, nameTutor, nationality);
     }
 
     return Scaffold(
@@ -330,7 +330,12 @@ class _HomeState extends State<Home> {
           child: SingleChildScrollView(
               child: Container(
                   child: Column(children: [
-            UpcomingLesson(upcominglesson: upcomingLesson!,totalLessonTime: totalLessonTime,),
+            (upcomingLesson != null)
+                ? UpcomingLesson(
+                    upcominglesson: upcomingLesson,
+                    totalLessonTime: totalLessonTime,
+                  )
+                : const SizedBox(),
             SearchTutor(filterCallback),
             Divider(
               // Add a horizontal line
@@ -340,7 +345,7 @@ class _HomeState extends State<Home> {
               indent: 20, // Line indent on the left
               endIndent: 10, // Line indent on the right
             ),
-            ListTutors(_tutorList, _favTutorsId,changeFavorite),
+            ListTutors(_tutorList, _favTutorsId, changeFavorite),
             Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(16),
@@ -354,11 +359,12 @@ class _HomeState extends State<Home> {
                       currentPage = number;
                     });
                     //Call API
-                    searchTutor(number, TutorRepository(), authProvider,specialities,nameTutor,national);
+                    searchTutor(number, TutorRepository(), authProvider,
+                        specialities, nameTutor, national);
                   },
                   useGroup: false,
                   totalPage: maxPage,
-                  show: maxPage-1,
+                  show: maxPage - 1,
                   currentPage: currentPage,
                 ))
           ]))),
@@ -383,7 +389,7 @@ class _HomeState extends State<Home> {
 
   Future<void> callApiGetListSchedules(
       BookingRepository bookingRepository, AuthProvider authProvider) async {
-    await bookingRepository.getIncomingLessons(
+    await bookingRepository.getUpcomingClass(
         accessToken: authProvider.token?.access?.token ?? "",
         page: 1,
         perPage: 100000,
@@ -398,7 +404,6 @@ class _HomeState extends State<Home> {
         });
   }
 
-
   int getShowPagesBasedOnPages(int pages) {
     if (pages > 2) {
       return 2;
@@ -411,8 +416,13 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> searchTutor(int page, TutorRepository tutorRepository,
-      AuthProvider authProvider, String filter, String name, Map<String,dynamic> nationality) async {
+  Future<void> searchTutor(
+      int page,
+      TutorRepository tutorRepository,
+      AuthProvider authProvider,
+      String filter,
+      String name,
+      Map<String, dynamic> nationality) async {
     await tutorRepository.searchTutor(
         accessToken: authProvider.token!.access!.token ?? "",
         page: page,
@@ -494,6 +504,7 @@ class _HomeState extends State<Home> {
       totalLessonTime = _printDuration(learningDuration);
     }
   }
+
   String _printDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -503,7 +514,8 @@ class _HomeState extends State<Home> {
 }
 
 class UpcomingLesson extends StatefulWidget {
-  const UpcomingLesson({required this.upcominglesson,required this.totalLessonTime, super.key});
+  const UpcomingLesson(
+      {required this.upcominglesson, required this.totalLessonTime, super.key});
   final BookingInfo upcominglesson;
   final String totalLessonTime;
 
@@ -512,12 +524,9 @@ class UpcomingLesson extends StatefulWidget {
 }
 
 class _UpcomingLessonState extends State<UpcomingLesson> {
-
-
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Color.fromARGB(255, 12, 61, 223);
-
 
     String convertTimeToString(int time1, int time2) {
       DateTime timestart = DateTime.fromMillisecondsSinceEpoch(time1);
@@ -555,24 +564,37 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
                   flex: 1,
                   child: Column(
                     children: [
+                      (widget.upcominglesson.scheduleDetailInfo!=null)?
                       Text(
                         DateFormat('EEEE, MMMM d').format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                widget.upcominglesson!= null ? widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp! : 0)),
+                            DateTime.fromMillisecondsSinceEpoch(widget
+                                .upcominglesson
+                                .scheduleDetailInfo!
+                                .startPeriodTimestamp!)),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
+                      ):const SizedBox(),
                       Text(
-                        convertTimeToString(widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp!= null ? widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp! : 0,
-                            widget.upcominglesson.scheduleDetailInfo!.endPeriodTimestamp!= null ? widget.upcominglesson.scheduleDetailInfo!.endPeriodTimestamp! : 0),
+                        convertTimeToString(
+                            widget.upcominglesson.scheduleDetailInfo!=null
+
+                                ? widget.upcominglesson.scheduleDetailInfo!
+                                    .startPeriodTimestamp!
+                                : 0,
+                            widget.upcominglesson.scheduleDetailInfo!=null
+
+                                ? widget.upcominglesson.scheduleDetailInfo!
+                                    .endPeriodTimestamp!
+                                : 0),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
+                      (widget.upcominglesson.scheduleDetailInfo!=null)?
                       CountdownTimer(
-                        endTime: widget.upcominglesson.scheduleDetailInfo!.startPeriodTimestamp!,
+                        endTime: widget.upcominglesson.scheduleDetailInfo!
+                            .startPeriodTimestamp!,
                         textStyle: TextStyle(color: Colors.yellow),
-
-                      ),
+                        ):const SizedBox(),
                     ],
                   ),
                 ),
@@ -620,15 +642,17 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
           SizedBox(
             height: 20,
           ),
-          Text(
-            (widget.totalLessonTime.isEmpty)
-                ? "Total lesson time is 0"
-                : "Total lesson time is: ${widget.totalLessonTime}",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
+          Visibility(
+              visible: widget.totalLessonTime != null,
+              child: Text(
+                (widget.totalLessonTime.isEmpty)
+                    ? "Total lesson time is 0"
+                    : "Total lesson time is: ${widget.totalLessonTime}",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              )),
         ],
       ),
     );

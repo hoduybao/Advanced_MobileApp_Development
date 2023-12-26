@@ -3,7 +3,6 @@ import 'package:advanced_mobileapp_development/presentation/Courses/listCourse.d
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 class Content extends StatefulWidget {
   const Content({super.key});
 
@@ -12,38 +11,39 @@ class Content extends StatefulWidget {
 }
 
 class _ContentState extends State<Content> {
-  int isActived=1;
+  int isActived = 1;
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
-      margin: EdgeInsets.only(top: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: 40,
             decoration: BoxDecoration(
                 border:
-                Border(bottom: BorderSide(width: 0.5, color: Colors.grey))),
+                    Border(bottom: BorderSide(width: 0.5, color: Colors.grey))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    border:isActived==1? Border(
-                      bottom: BorderSide(
-                        color: Colors.blue, // Border color
-                        width: 1,
-                        // Border width
-                      ),
-                      // Border radius
-                    ):null,
+                    border: isActived == 1
+                        ? Border(
+                            bottom: BorderSide(
+                              color: Colors.blue, // Border color
+                              width: 1,
+                              // Border width
+                            ),
+                            // Border radius
+                          )
+                        : null,
                   ),
                   child: TextButton(
                       onPressed: () {
                         setState(() {
-                          isActived=1;
+                          isActived = 1;
                         });
                       },
                       style: TextButton.styleFrom(
@@ -51,25 +51,28 @@ class _ContentState extends State<Content> {
                       ),
                       child: Text(
                         "Course",
-                        style: TextStyle(color: isActived==1? Colors.blue:Colors.grey),
+                        style: TextStyle(
+                            color: isActived == 1 ? Colors.blue : Colors.grey),
                       )),
                 ),
                 SizedBox(width: 10),
                 Container(
                   decoration: BoxDecoration(
-                    border:isActived==2? Border(
-                      bottom: BorderSide(
-                        color: Colors.blue, // Border color
-                        width: 1,
-                        // Border width
-                      ),
-                      // Border radius
-                    ):null,
+                    border: isActived == 2
+                        ? Border(
+                            bottom: BorderSide(
+                              color: Colors.blue, // Border color
+                              width: 1,
+                              // Border width
+                            ),
+                            // Border radius
+                          )
+                        : null,
                   ),
                   child: TextButton(
                       onPressed: () {
                         setState(() {
-                          isActived=2;
+                          isActived = 2;
                         });
                       },
                       style: TextButton.styleFrom(
@@ -77,26 +80,28 @@ class _ContentState extends State<Content> {
                       ),
                       child: Text(
                         "E-Book",
-                        style: TextStyle(color:isActived==2? Colors.blue:Colors.grey),
+                        style: TextStyle(
+                            color: isActived == 2 ? Colors.blue : Colors.grey),
                       )),
                 ),
                 SizedBox(width: 10),
-
                 Container(
                   decoration: BoxDecoration(
-                    border:isActived==3? Border(
-                      bottom: BorderSide(
-                        color: Colors.blue, // Border color
-                        width: 1,
-                        // Border width
-                      ),
-                      // Border radius
-                    ):null,
+                    border: isActived == 3
+                        ? Border(
+                            bottom: BorderSide(
+                              color: Colors.blue, // Border color
+                              width: 1,
+                              // Border width
+                            ),
+                            // Border radius
+                          )
+                        : null,
                   ),
                   child: TextButton(
                       onPressed: () {
                         setState(() {
-                          isActived=3;
+                          isActived = 3;
                         });
                       },
                       style: TextButton.styleFrom(
@@ -104,21 +109,17 @@ class _ContentState extends State<Content> {
                       ),
                       child: Text(
                         "Interactive E-book",
-                        style: TextStyle(color: isActived==3? Colors.blue:Colors.grey),
+                        style: TextStyle(
+                            color: isActived == 3 ? Colors.blue : Colors.grey),
                       )),
                 )
               ],
             ),
           ),
-          Visibility(
-              visible:isActived==2,
-              child: ListBook()),
-          Visibility(
-              visible:isActived==1,
-              child: ListCourse())
+          Visibility(visible: isActived == 2, child: ListBook()),
+         Visibility(visible: isActived == 1, child: ListCourse())
         ],
       ),
     );
   }
-
 }

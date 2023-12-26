@@ -1,5 +1,10 @@
 import 'dart:convert';
+import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
+import 'package:advanced_mobileapp_development/model/schedule/schedule.dart';
+import 'package:advanced_mobileapp_development/model/tutor/tutor_model.dart';
 import 'package:advanced_mobileapp_development/repository/schedule-student-repository.dart';
+import 'package:advanced_mobileapp_development/services/booking.api.dart';
+import 'package:advanced_mobileapp_development/services/schedule.api.dart';
 import 'package:intl/intl.dart';
 import 'package:advanced_mobileapp_development/presentation/DetailTutor/booking_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,77 +16,89 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../model/schedule-dto.dart';
 
 class Booking extends StatefulWidget {
-  const Booking({super.key});
+  const Booking({required this.tutor, super.key});
+  final TutorModel tutor;
   @override
   State<Booking> createState() => _BookingState();
 }
 
 class _BookingState extends State<Booking> {
-  late Future<List<ScheduleDTO>> _loadScheduleFuture;
+  List<ScheduleModel> listScheduleByDate = [];
+  late int startTime;
+  late int endTime;
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _loadScheduleFuture = loadScheduleOfTutor();
-
-    });
-  }
-
-  Future<List<ScheduleDTO>> loadScheduleOfTutor() async {
-    String jsonString = await rootBundle.loadString('assets/data/schedule.json');
-    Map<String, dynamic> jsonData = json.decode(jsonString);
-
-    List<Map<String, dynamic>> schedules = [];
-
-    if (jsonData['data'] != null && jsonData['data'] is List) {
-      schedules = List<Map<String, dynamic>>.from(jsonData["data"]);
-    }
-    print("Hihi" + schedules.length.toString());
-
-    return schedules.map((json) => ScheduleDTO.fromJson(json)).toList();
   }
 
   @override
+  Future<void> didChangeDependencies() async {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    ScheduleRepository scheduleRepository = ScheduleRepository();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    int startTime = DateTime.now().millisecondsSinceEpoch;
+    int endTime = startTime + Duration(days: 4).inMilliseconds;
+
+    await scheduleRepository.getScheduleById(
+        tutorId: widget.tutor.userId!,
+        startTime: startTime,
+        endTime: endTime,
+        accessToken: authProvider.token?.access?.token ?? "",
+        onSuccess: (schedules) {
+          setState(() {
+            listScheduleByDate = schedules;
+          });
+        },
+        onFail: (message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error when get schedule: $message'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    ScheduleRepository scheduleRepository=ScheduleRepository();
+    BookingRepository bookingRepository=BookingRepository();
 
-    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
-
-    List<TimeRegion> _getTimeRegions(List<ScheduleDTO> listScheduleOfTutor ) {
+    List<TimeRegion> _getTimeRegions(String? idUser) {
       final List<TimeRegion> regions = <TimeRegion>[];
-      print("a " +listScheduleOfTutor.length.toString());
 
-      for (int i = 0; i < listScheduleOfTutor.length; i++) {
-        print(2);
-
-        int timestamp = listScheduleOfTutor[i].startTimestamp;
-        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-        DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour, dateTime.minute, dateTime.second);
-        print(1);
-        print(date);
+      for (int i = 0; i < listScheduleByDate.length; i++) {
+        int? timestamp = listScheduleByDate[i].startTimestamp;
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp!);
+        DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day,
+            dateTime.hour, dateTime.minute, dateTime.second);
         regions.add(TimeRegion(
           startTime: date,
           endTime: date.add(Duration(minutes: 30)),
           enablePointerInteraction: true,
           color: Colors.grey.withOpacity(0.2),
-          text: listScheduleOfTutor[i].isBooked?"Booked":'Book',
+          text: !listScheduleByDate[i].isBooked!
+              ? "Book"
+              : (listScheduleByDate[i]
+              .scheduleDetails?[0]
+              ?.bookingInfo?[0]
+              ?.userId ==
+              idUser)
+              ? "Booked"
+              : "Reserved",
         ));
-
       }
 
       return regions;
     }
 
-    return FutureBuilder<List<ScheduleDTO>>(
-      future: _loadScheduleFuture,
-      builder: (BuildContext context, AsyncSnapshot<List<ScheduleDTO>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasData) {
-          List<ScheduleDTO> listScheduleOfTutor = snapshot.data as List<ScheduleDTO>;
-          print("Zoooooooooooo"+listScheduleOfTutor.length.toString());
-          return Container(
+    return Container(
             height: 2520,
             child: SfCalendar(
               view: CalendarView.week,
@@ -89,17 +106,44 @@ class _BookingState extends State<Booking> {
               showNavigationArrow: true,
               showCurrentTimeIndicator: false,
               timeSlotViewSettings: TimeSlotViewSettings(
-                timeInterval: Duration(minutes: 30), timeFormat: 'h:mm a',
+                timeInterval: Duration(minutes: 30),
+                timeFormat: 'HH:mm',
                 timeIntervalHeight: 50,
-                dateFormat: 'd', dayFormat: 'EEE',
+                dateFormat: 'd',
+                dayFormat: 'EEE',
                 startHour: 0, // Set the start hour (24-hour format)
-                endHour: 24, numberOfDaysInView: 5,
+                endHour: 24,
+                numberOfDaysInView: 5,
                 // Set the end hour (24-hour format)
               ),
-              specialRegions:  _getTimeRegions(listScheduleOfTutor),
-              timeRegionBuilder: (BuildContext context, TimeRegionDetails details) {
-                if (details.region.text == 'Book')
-                {
+              onViewChanged: (ViewChangedDetails details) async {
+                startTime = details.visibleDates[0].millisecondsSinceEpoch;
+                endTime = details.visibleDates[details.visibleDates.length - 1]
+                    .millisecondsSinceEpoch;
+                await scheduleRepository.getScheduleById(
+                    tutorId: widget.tutor.userId!,
+                    startTime: startTime,
+                    endTime: endTime,
+                    accessToken: authProvider.token?.access?.token ?? "",
+                    onSuccess: (schedules) {
+                      setState(() {
+                        listScheduleByDate = schedules;
+                      });
+                    },
+                    onFail: (message) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error when get schedule: $message'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    });
+              },
+                specialRegions: _getTimeRegions(authProvider.currentUser?.id!),
+              timeRegionBuilder:
+                  (BuildContext context, TimeRegionDetails details) {
+                if (details.region.text == 'Book') {
                   return Container(
                     alignment: Alignment.center,
                     child: TextButton(
@@ -109,7 +153,7 @@ class _BookingState extends State<Booking> {
                           padding: MaterialStateProperty.all(
                               EdgeInsets.symmetric(horizontal: 8, vertical: 3)),
                           backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
+                              MaterialStateProperty.all<Color>(Colors.blue),
                         ),
                         onPressed: () {},
                         child: Text(
@@ -117,8 +161,7 @@ class _BookingState extends State<Booking> {
                           style: TextStyle(color: Colors.white),
                         )),
                   );
-                }
-                else{
+                } else {
                   return Container(
                     alignment: Alignment.center,
                     child: Text(
@@ -127,50 +170,96 @@ class _BookingState extends State<Booking> {
                     ),
                   );
                 }
-
               },
               onTap: (CalendarTapDetails details) async {
                 if (details.targetElement == CalendarElement.calendarCell) {
                   // Check if the tap is within a time region
                   DateTime tappedTime = details.date!;
-                  List<TimeRegion> timeRegions = _getTimeRegions(listScheduleOfTutor);
-                  for (int i=0;i<timeRegions.length;i++) {
+                  List<TimeRegion> timeRegions =
+                  _getTimeRegions(authProvider.currentUser?.id!);
+                  for (int i = 0; i < timeRegions.length; i++) {
                     if (tappedTime.isAtSameMomentAs(timeRegions[i].startTime) &&
-                        tappedTime.isBefore(timeRegions[i].endTime) &&!listScheduleOfTutor[i].isBooked) {
-                      DateTime timestart=DateTime.fromMillisecondsSinceEpoch(listScheduleOfTutor[i].startTimestamp);
-                      DateTime timeend=DateTime.fromMillisecondsSinceEpoch(listScheduleOfTutor[i].endTimestamp);
+                        tappedTime.isBefore(timeRegions[i].endTime) &&
+                        !listScheduleByDate[i].isBooked!) {
+                      DateTime timestart = DateTime.fromMillisecondsSinceEpoch(
+                          listScheduleByDate[i].startTimestamp!);
+                      DateTime timeend = DateTime.fromMillisecondsSinceEpoch(
+                          listScheduleByDate[i].endTimestamp!);
 
-                      String start="${timestart.hour.toString().length==1?"0"+timestart.hour.toString():timestart.hour.toString()}:${timestart.minute.toString().length==1?"0"+timestart.minute.toString():timestart.minute.toString()}";
-                      String end="${timeend.hour.toString().length==1?"0"+timeend.hour.toString():timeend.hour.toString()}:${timeend.minute.toString().length==1?"0"+timeend.minute.toString():timeend.minute.toString()}";
-                      String date=DateFormat.yMMMMEEEEd().format(DateTime.fromMillisecondsSinceEpoch(listScheduleOfTutor[i].startTimestamp!));
+                      String start =
+                          "${timestart.hour.toString().length == 1 ? "0" + timestart.hour.toString() : timestart.hour.toString()}:${timestart.minute.toString().length == 1 ? "0" + timestart.minute.toString() : timestart.minute.toString()}";
+                      String end =
+                          "${timeend.hour.toString().length == 1 ? "0" + timeend.hour.toString() : timeend.hour.toString()}:${timeend.minute.toString().length == 1 ? "0" + timeend.minute.toString() : timeend.minute.toString()}";
+                      String date = DateFormat.yMMMMEEEEd().format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              listScheduleByDate[i].startTimestamp!));
                       final dialogResult = await showDialog(
                         context: context,
-                        builder: (context) => BookingConfirmDialog(start: start, end: end, date: date),
+                        builder: (context) => BookingConfirmDialog(
+                            start: start, end: end, date: date),
                       );
 
-                      if(dialogResult)
-                      {
-                        mySchedule.addSchedule(listScheduleOfTutor[i]);
-                        setState(() {
-                          listScheduleOfTutor[i].booking();
-                        });
-                      }
+                      if (dialogResult[0]) {
 
-                      // Tap is within a time region, perform your action
+                        try {
+                          List<String> list = [];
+                          list.add(
+                              listScheduleByDate[i].scheduleDetails!.first.id!);
+                          await bookingRepository.bookClass(
+                              scheduleDetailIds: list,notes: dialogResult[1], accessToken:authProvider.token?.access?.token ?? "", onSuccess:  (message) async {
+                            await scheduleRepository.getScheduleById(
+                               tutorId: widget.tutor.userId!,
+                               startTime: startTime,
+                              endTime:  endTime,
+                               accessToken: authProvider.token?.access?.token??" ", onSuccess:  (schedules) {
+                              setState(() {
+                                listScheduleByDate = schedules;
+                              });
+                            }, onFail:  (message) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                  Text('Error: $message'),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(message),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.green,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },onFail:  (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(error),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          });
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString()),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        } finally {}
+                      }
                     }
                   }
                 }
               },
             ),
           );
-
-        } else {
-          // Dữ liệu đã được tải, có thể sử dụng nó
-          return Center(
-            child: Text('Error loading.dart data'),
-          );
-        }
-      },
-    );
   }
 }

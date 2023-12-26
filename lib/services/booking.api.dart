@@ -1,4 +1,6 @@
 
+import 'package:advanced_mobileapp_development/responses/list_booking_homepage_response.dart';
+
 import '../model/schedule/booking_infor.dart';
 import '../responses/list_booking_response.dart';
 import '../services/api_service.dart';
@@ -9,7 +11,7 @@ class BookingRepository extends BaseRepository {
 
   BookingRepository() : super(prefix);
 
-  Future<void> getIncomingLessons({
+  Future<void> getUpcomingClass({
     required String accessToken,
     required String now,
     required int page,
@@ -33,4 +35,51 @@ class BookingRepository extends BaseRepository {
         break;
     }
   }
+  // Future<void> getUpcomingClassHomePage({
+  //   required String accessToken,
+  //   required int now,
+  //   required Function(List<BookingInfo>) onSuccess,
+  //   required Function(String) onFail,
+  // }) async {
+  //   final response = await service.get(
+  //       url: "next?dateTime=$now",
+  //       headers: {"Authorization": "Bearer $accessToken"}) as BoundResource;
+  //
+  //   switch (response.statusCode) {
+  //     case 200:
+  //     case 201:
+  //       onSuccess(
+  //           ResponseGetNextBookingInfo.fromJson(response.response).data ?? []);
+  //       break;
+  //     default:
+  //       onFail(response.errorMsg.toString());
+  //       break;
+  //   }
+  // }
+  Future<void> bookClass({
+    required String accessToken,
+    required String notes,
+    required List<String> scheduleDetailIds,
+    required Function(String) onSuccess,
+    required Function(String) onFail,
+  }) async {
+    final response = await service.post(
+        url: "",
+        data: {"note": notes, "scheduleDetailIds": scheduleDetailIds},
+        headers: {"Authorization": "Bearer $accessToken"}) as BoundResource;
+
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        onSuccess(response.response['message']);
+        break;
+      default:
+        onFail(response.errorMsg.toString());
+        break;
+    }
+  }
+
+
+
+
 }

@@ -4,7 +4,7 @@ import '../tutor/tutor_model.dart';
 import 'schedule_detail.dart';
 
 @JsonSerializable()
-class Schedule {
+class ScheduleModel {
   String? id;
   String? date;
   String? tutorId;
@@ -18,7 +18,7 @@ class Schedule {
   List<ScheduleDetail>? scheduleDetails;
   TutorModel? tutorInfo;
 
-  Schedule({
+  ScheduleModel({
     this.id,
     this.date,
     this.tutorId,
@@ -37,7 +37,7 @@ class Schedule {
     return "$startTime:$endTime";
   }
 
-  factory Schedule.fromJson(Map<String, dynamic> json) => Schedule(
+  factory ScheduleModel.fromJson(Map<String, dynamic> json) => ScheduleModel(
         id: json['id'] as String?,
         date: json['date'] as String?,
         tutorId: json['tutorId'] as String?,

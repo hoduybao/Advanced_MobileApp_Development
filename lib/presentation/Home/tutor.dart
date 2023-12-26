@@ -124,7 +124,7 @@ class _TutorState extends State<Tutor> {
                       ),
                       child: ClipOval(
                         child: Image.network(widget.tutor.avatar ??
-                            "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg"), // Thay thế bằng hình ảnh của bạn
+                            "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg"), // Thay thế bằng hình ảnh của bạn
                       ),
                     ),
                   ),

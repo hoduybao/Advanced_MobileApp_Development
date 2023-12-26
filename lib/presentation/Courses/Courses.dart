@@ -1,4 +1,3 @@
-
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/filter.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/search.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 
 import '../Schedule/Schedule.dart';
 import 'content.dart';
@@ -21,11 +19,8 @@ class Courses extends StatefulWidget {
 }
 
 class _CoursesState extends State<Courses> {
-
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -155,7 +150,8 @@ class _CoursesState extends State<Courses> {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                var authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
                 authProvider.clearUserInfo();
               },
             ),
@@ -211,23 +207,23 @@ class _CoursesState extends State<Courses> {
       ),
       body: SingleChildScrollView(
           child: Container(
-        padding: EdgeInsets.all(30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SearchCourse(),
-            SizedBox(
-              height: 15,
+            padding: EdgeInsets.all(25),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SearchCourse(),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                    "LiveTutor has built the most quality, methodical and scientific courses in the fields of life for those who are in need of improving their knowledge of the fields."),
+                Filter(),
+                SizedBox(height: 20),
+                Content(),
+              ],
             ),
-            Text(
-                "LiveTutor has built the most quality, methodical and scientific courses in the fields of life for those who are in need of improving their knowledge of the fields."),
-            Filter(),
-            Content()
-          ],
-        ),
-      )),
+          )),
     );
   }
 }
-
-

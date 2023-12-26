@@ -1,21 +1,43 @@
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
-import 'package:advanced_mobileapp_development/main.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/session.dart';
+import 'package:advanced_mobileapp_development/services/booking.api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../repository/schedule-student-repository.dart';
+import '../../model/schedule/booking_infor.dart';
 import '../Courses/Courses.dart';
 import '../Home/Home.dart';
 
-class Schedule extends StatelessWidget {
+class Schedule extends StatefulWidget {
   const Schedule({super.key});
+
+  @override
+  State<Schedule> createState() => _ScheduleState();
+}
+
+class _ScheduleState extends State<Schedule> {
+  List<BookingInfo> listLesson = [];
+  bool isCallApi = false;
+
+  bool loading = true;
+
+  int currentPage = 1;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
+    if (!isCallApi) {
+      callApiGetOwnSchedules(1, BookingRepository(), authProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
 
     return Scaffold(
       endDrawer: Drawer(
@@ -146,7 +168,8 @@ class Schedule extends StatelessWidget {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                var authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
                 authProvider.clearUserInfo();
               },
             ),
@@ -242,15 +265,50 @@ class Schedule extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            ListView(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              children: mySchedule.mySchedule.length!=0?[Session(typeSession: "Schedule", schedule:mySchedule.mySchedule[0])]
-            :[],
-            ),
+            Visibility(
+                visible: !loading,
+                child: ListView(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  children: listLesson.isNotEmpty
+                      ? [
+                          Session(
+                              typeSession: "Schedule",
+                              schedule: listLesson[0])
+                        ]
+                      : [],
+                ))
           ]),
         ),
       ),
     );
+  }
+
+  Future<void> callApiGetOwnSchedules(int page,
+      BookingRepository bookingRepository, AuthProvider authProvider) async {
+    await bookingRepository.getUpcomingClass(
+        accessToken: authProvider.token?.access?.token ?? "",
+        page: page,
+        perPage: 20,
+        now: DateTime.now().millisecondsSinceEpoch.toString(),
+        onSuccess: (response, total) async {
+          listLesson = [];
+          for (var value in response) {
+            if (value.isDeleted != true) {
+              listLesson.insert(0, value);
+            }
+          }
+
+          setState(() {
+            isCallApi = true;
+            loading = false;
+          });
+          currentPage = page;
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
   }
 }

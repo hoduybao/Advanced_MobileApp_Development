@@ -15,9 +15,7 @@ import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
 import '../../common/loading.dart';
-import '../../model/schedule-dto.dart';
 import '../../model/tutor/infor.dart';
-import '../../repository/favorite-repository.dart';
 import '../../services/tutors.api.dart';
 
 
@@ -250,9 +248,9 @@ class _DetailTutorState extends State<DetailTutor> {
                   ChewieDemo(linkVideo: tutorInfo.video!),
                   InfoDetail(tutorInfo!),
                   SizedBox(height: 20),
-                  ListReview(tutorData.feedbacks!),
+                  ListReview(tutorData.feedbacks!.sublist(0,10)),
                   SizedBox(height: 20),
-                  Booking()
+                  Booking(tutor: widget.tutor)
                 ]))));
   }
   Future<void> callAPIGetTutorById(TutorRepository tutorRepository,

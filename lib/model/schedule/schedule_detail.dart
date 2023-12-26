@@ -1,7 +1,7 @@
+import 'package:advanced_mobileapp_development/model/schedule/schedule.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'booking_infor.dart';
-import 'schedule.dart';
 
 
 @JsonSerializable()
@@ -16,7 +16,7 @@ class ScheduleDetail {
   String? updatedAt;
   List<BookingInfo>? bookingInfo;
   bool? isBooked;
-  Schedule? scheduleInfo;
+  ScheduleModel? scheduleInfo;
   ScheduleDetail({
     this.startPeriodTimestamp,
     this.endPeriodTimestamp,
@@ -46,19 +46,7 @@ class ScheduleDetail {
         isBooked: json['isBooked'] as bool?,
         scheduleInfo: json['scheduleInfo'] == null
             ? null
-            : Schedule.fromJson(json['scheduleInfo'] as Map<String, dynamic>),
+            : ScheduleModel.fromJson(json['scheduleInfo'] as Map<String, dynamic>),
       );
-  Map<String, dynamic> toJson() => <String, dynamic>{
-    'startPeriodTimestamp': startPeriodTimestamp,
-    'endPeriodTimestamp': endPeriodTimestamp,
-    'id': id,
-    'scheduleId': scheduleId,
-    'startPeriod': startPeriod,
-    'endPeriod': endPeriod,
-    'createdAt':createdAt,
-    'updatedAt': updatedAt,
-    'bookingInfo': bookingInfo,
-    'isBooked': isBooked,
-    'scheduleInfo': scheduleInfo,
-  };
+
 }

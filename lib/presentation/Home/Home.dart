@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:advanced_mobileapp_development/common/loading.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
@@ -327,7 +328,7 @@ class _HomeState extends State<Home> {
           onRefresh: () async {
             refreshHome(authProvider);
           },
-          child: SingleChildScrollView(
+          child:isLoading?Loading():SingleChildScrollView(
               child: Container(
                   child: Column(children: [
             (upcomingLesson != null)

@@ -1,5 +1,6 @@
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/filter.dart';
+import 'package:advanced_mobileapp_development/presentation/Courses/listCourse.dart';
 import 'package:advanced_mobileapp_development/presentation/Courses/search.dart';
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
@@ -209,7 +210,6 @@ class _CoursesState extends State<Courses> {
           child: Container(
             padding: EdgeInsets.all(25),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SearchCourse(),
@@ -220,7 +220,9 @@ class _CoursesState extends State<Courses> {
                     "LiveTutor has built the most quality, methodical and scientific courses in the fields of life for those who are in need of improving their knowledge of the fields."),
                 Filter(),
                 SizedBox(height: 20),
-                Content(),
+                ListCourse(),
+                SizedBox(height: 10),
+
               ],
             ),
           )),

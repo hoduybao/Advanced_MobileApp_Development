@@ -1,3 +1,4 @@
+import 'package:advanced_mobileapp_development/common/loading.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,16 +7,41 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
+import '../../model/schedule/booking_infor.dart';
 import '../../repository/schedule-student-repository.dart';
+import '../../services/booking.api.dart';
 import '../Courses/Courses.dart';
 import '../Schedule/Schedule.dart';
+import '../Schedule/session.dart';
 
-class History extends StatelessWidget {
+class History extends StatefulWidget {
   const History({super.key});
+
+  @override
+  State<History> createState() => _HistoryState();
+}
+
+class _HistoryState extends State<History> {
+  List<BookingInfo> listHistoryLesson = [];
+  bool isCallApi = false;
+  bool loading = true;
+
+  //Pagination
+  int currentPage = 1;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
+    if (!isCallApi) {
+      callApiGetHistoryLesson(1, BookingRepository(), authProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    MyScheduleChangeNotifier mySchedule = context.watch<MyScheduleChangeNotifier>();
-
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -145,7 +171,8 @@ class History extends StatelessWidget {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                var authProvider=Provider.of<AuthProvider>(context, listen: false);
+                var authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
                 authProvider.clearUserInfo();
               },
             ),
@@ -199,7 +226,7 @@ class History extends StatelessWidget {
               )),
         ),
       ),
-      body: SingleChildScrollView(
+      body: loading? Loading(): SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(25),
           child:
@@ -240,19 +267,47 @@ class History extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            ListView(
+            ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              children: [
-                // Session(
-                //   typeSession: "History", schedule:mySchedule.mySchedule[0]
-                // ),
-
-              ],
+              itemCount: listHistoryLesson?.length,
+              itemBuilder: (context, index) {
+                return Session(
+                    typeSession: "History", schedule: listHistoryLesson[index]);
+                // Add more customization here if needed
+              },
             ),
           ]),
         ),
       ),
     );
+  }
+
+  Future<void> callApiGetHistoryLesson(int page,
+      BookingRepository bookingRepository, AuthProvider authProvider) async {
+    await bookingRepository.getHistoryLesson(
+        accessToken: authProvider.token?.access?.token ?? "",
+        page: page,
+        perPage: 20,
+        now: DateTime.now().millisecondsSinceEpoch.toString(),
+        onSuccess: (response, total) async {
+          listHistoryLesson = [];
+
+          for (var value in response) {
+            if (value.isDeleted != true) {
+              listHistoryLesson.add(value);
+            }
+          }
+          setState(() {
+            isCallApi = true;
+            loading = false;
+          });
+          currentPage = page;
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
   }
 }

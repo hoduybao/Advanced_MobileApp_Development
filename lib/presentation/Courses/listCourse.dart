@@ -75,7 +75,6 @@ class _ListCourseState extends State<ListCourse> {
           );
   }
 
-
   Future<void> callAPIGetCourseList(int page, CourseRepository courseRepository,
       CourseProvider courseProvider, AuthProvider authProvider) async {
     await courseRepository.getCourseListWithPagination(

@@ -46,7 +46,7 @@ class _HomeState extends State<Home> {
 
   //Upcoming
   String totalLessonTime = "";
-  BookingInfo upcomingLesson = new BookingInfo();
+  BookingInfo upcomingLesson =  BookingInfo();
   //search
   String specialities = 'all';
   String nameTutor = "";
@@ -548,7 +548,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
       child: Column(
         children: [
           Text(
-            widget.upcominglesson == null
+            widget.upcominglesson?.id == null
                 ? "You have no upcoming lesson."
                 : "Upcoming lesson",
             textAlign: TextAlign.center,
@@ -558,7 +558,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
             height: widget.upcominglesson != null ? 20 : 0,
           ),
           Visibility(
-            visible: widget.upcominglesson != null,
+            visible: widget.upcominglesson.id != null,
             child: Row(
               children: [
                 Expanded(

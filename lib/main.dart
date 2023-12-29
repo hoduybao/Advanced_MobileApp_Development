@@ -37,82 +37,6 @@ class _MyAppState extends State<MyApp> {
   List<TutorDTO> listTutor=[];
   List<CourseDTO> listCourse=[];
 
-  final  mySchedule=new MyScheduleChangeNotifier();
-  final favouriteRepository = new FavouriteRepository();
- // late User userData;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    loadTutors();
-    loadCourse();
-   // loadUser();
-  }
-  // Future<void> loadUser() async {
-  //   // Đọc dữ liệu từ file JSON
-  //   User data;
-  //   String jsonString = await rootBundle.loadString('assets/data/user.json');
-  //   Map<String, dynamic> jsonData = json.decode(jsonString);
-  //
-  //   // Lấy danh sách tutors từ dữ liệu JSON
-  //   Map<String, dynamic> userJson = {};
-  //
-  //   if (jsonData['user'] != null) {
-  //     userJson = Map<String, dynamic>.from(jsonData['user']);
-  //   }
-  //   print(userJson);
-  //   userData=User.fromJson(userJson);
-  // }
-
-  Future<void> loadCourse() async {
-    // Đọc dữ liệu từ file JSON
-    String jsonString = await rootBundle.loadString('assets/data/course.json');
-    Map<String, dynamic> jsonData = json.decode(jsonString);
-
-    // Lấy danh sách tutors từ dữ liệu JSON
-    List<Map<String, dynamic>> courseList = [];
-
-    if (jsonData['data'] != null && jsonData['data']['rows'] is List) {
-      courseList = List<Map<String, dynamic>>.from(jsonData['data']['rows']);
-    }
-      listCourse=courseList.map((json) => CourseDTO.fromJson(json)).toList();
-  }
-
-  Future<void> loadTutors() async {
-    // Đọc dữ liệu từ file JSON
-    String jsonString = await rootBundle.loadString('assets/data/dataTutor.json');
-    Map<String, dynamic> jsonData = json.decode(jsonString);
-
-    // Lấy danh sách tutors từ dữ liệu JSON
-    List<Map<String, dynamic>> tutorList = [];
-    List<Map<String, dynamic>> favoriteList = [];
-
-    if (jsonData['tutors'] != null && jsonData['tutors']['rows'] is List) {
-      tutorList = List<Map<String, dynamic>>.from(jsonData['tutors']['rows']);
-    }
-
-    // Chuyển đổi thành danh sách các đối tượng Tutor'
-      listTutor = tutorList.map((json) => TutorDTO.fromJson(json)).toList();
-
-    if(jsonData['tutors'] != null && jsonData['favoriteTutor'] is List)
-      {
-        favoriteList = List<Map<String, dynamic>>.from(jsonData['favoriteTutor']);
-      }
-    List<String> idindex = [];
-
-    for (var tutor in favoriteList) {
-      String secondId = tutor['secondId'];
-      idindex.add(secondId);
-    }
-
-    setState(() {
-      favouriteRepository.setListIds(idindex);
-    });
-
-
-
-  }
 
 
   Widget displayWidget() {
@@ -131,8 +55,6 @@ class _MyAppState extends State<MyApp> {
         Provider(create: (context)=>listTutor),
         Provider(create: (context)=>listCourse),
         ChangeNotifierProvider(create: (context)=>courseProvider),
-        ChangeNotifierProvider(create: (context) => favouriteRepository),
-        ChangeNotifierProvider(create: (context)=> mySchedule),
       ],
       child: MaterialApp(
           title: 'LetTutor',

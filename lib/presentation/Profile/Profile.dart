@@ -8,11 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
 import 'package:provider/provider.dart';
-//import 'package:src/data/model/user/user.dart';
-//import 'package:src/data/model/user/user_data.dart';
-//import 'package:src/pages/profilePage/components/birthday-select.dart';
-//import 'package:src/pages/profilePage/components/text-area.dart';
-//import 'package:src/providers/user_provider.dart';
+import '../../Provider/auth_provider.dart';
+import '../../services/user.api.dart';
 import 'birthday-select.dart';
 import 'country-select.dart';
 
@@ -24,7 +21,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late UserModel userData;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
@@ -35,14 +31,13 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> countries = ['Vietnam', 'United States', 'Canada', 'Other'];
   String selectedCountry = "Vietnam";
   List<String> itemsLevel = [
-    "Beginner",
-    "Upper-Beginner",
-    "Pre-Intermediate",
-    "Intermediate",
-    "Upper-Intermediate",
-    "Pre-Advanced",
-    "Adva nced",
-    "Very Advanced"
+    "BEGINNER",
+    "HIGHER-BEGINNER",
+    "PRE-INTERMEDIATE",
+    "INTERMEDIATE",
+    "UPPER-INTERMEDIATE",
+    "ADVANCED",
+    "PROFICIENCY"
   ];
   List<String> itemsCategory = [
     'All',
@@ -65,69 +60,12 @@ class _ProfilePageState extends State<ProfilePage> {
   late bool hasInitValue = false;
   XFile? _pickedFile;
 
-  Future<void> changeImage() async {
-    // Show options for image source (camera or gallery)
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.camera),
-                title: Text('Capture Photo'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  _captureImage();
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Choose from Gallery'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  _pickImage();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
-  Future<void> _captureImage() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-        source: ImageSource.camera, maxWidth: 1800, maxHeight: 1800);
-    setState(() {
-      _pickedFile = image;
-    });
-    if (_pickedFile != null) {
-      // Update the profile picture with the new image URL
-      // You may need to upload the image to a server and get the new URL
-      // For simplicity, I'm using the local file path as the URL
-      String newImageUrl = _pickedFile!.path;
-    }
-  }
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery, maxWidth: 1800, maxHeight: 1800);
-    setState(() {
-      _pickedFile = image;
-    });
 
-    if (_pickedFile != null) {
-      // Update the profile picture with the new image URL
-      // You may need to upload the image to a server and get the new URL
-      // For simplicity, I'm using the local file path as the URL
-      String newImageUrl = _pickedFile!.path;
-    }
-  }
 
   void initValues(UserModel userData) {
+
     setState(() {
       nameController.text = userData.name ?? "";
       emailController.text = userData.email ?? "";
@@ -165,21 +103,21 @@ class _ProfilePageState extends State<ProfilePage> {
         });
       }
 
-      // check = false;
-      // userData.user?.learnTopics?.forEach((element) {
-      //   selectedCategory.add(element.key!.toUpperCase());
-      // });
-      // for(var element in itemsCategory){
-      //   userData.user?.learnTopics?.forEach((e) {
-      //     if(e.key?.toString().compareTo(element.toLowerCase()) != null){
-      //       check == true;
-      //
-      //       setState(() {
-      //         itemsCategory.add(e.key!.toUpperCase().toString());
-      //       });
-      //     }
-      //   });
-      // }
+      check = false;
+      userData?.learnTopics?.forEach((element) {
+        selectedCategory.add(element.key!.toUpperCase());
+      });
+      for(var element in itemsCategory){
+        userData?.learnTopics?.forEach((e) {
+          if(e.key?.toString().compareTo(element.toLowerCase()) != null){
+            check == true;
+
+            setState(() {
+              itemsCategory.add(e.key!.toUpperCase().toString());
+            });
+          }
+        });
+      }
 
       hasInitValue = true;
     });
@@ -187,9 +125,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    var authProvider=Provider.of<AuthProvider>(context, listen: false);
 
     if (hasInitValue == false) {
-      initValues(userData);
+      initValues(authProvider.currentUser!);
     }
     return Scaffold(
       appBar: PreferredSize(
@@ -264,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               image: _pickedFile != null
                                   ? FileImage(File(_pickedFile!.path))
                                       as ImageProvider<Object>
-                                  : NetworkImage(userData.avatar ??
+                                  : NetworkImage(authProvider.currentUser?.avatar ??
                                       "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg"))),
                     ),
                     Positioned(
@@ -272,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       right: 0,
                       child: GestureDetector(
                         onTap: () {
-                          changeImage();
+                          _getFromGallery(authProvider);
                         },
                         child: Container(
                           height: 40,
@@ -298,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(height: 10),
               Center(
                 child: Text(
-                  userData?.name ?? "Anonymous",
+                  authProvider.currentUser?.name ?? "Anonymous",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w500,
@@ -306,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(height: 10),
-              Center(child: _buildInfo("Account ID: ", userData.id ?? "")),
+              Center(child: _buildInfo("Account ID: ", authProvider.currentUser?.id ?? "")),
               SizedBox(height: 10),
               Center(
                   child: GestureDetector(
@@ -340,7 +279,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              _buildForm(userData),
+              _buildForm(authProvider.currentUser!),
             ],
           ),
         ),
@@ -447,23 +386,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return ElevatedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
-          // Update user info
-          UserModel updatedUser = userData;
-          updatedUser.name = nameController.text;
-          updatedUser.country = selectedCountry;
-          updatedUser.birthday = DateFormat('yyyy-MM-dd').format(selectedDate);
-          updatedUser.level = selectedLevel;
-          updatedUser.studySchedule = studyScheduleController.text;
-          //userData.updateData(updatedUser);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Update successful!.'),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 2),
-            ),
-          );
+          var authProvider=Provider.of<AuthProvider>(context, listen: false);
+
+          callAPIUpdateProfile(UserRepository(),authProvider);
+
         }
       },
       style: ElevatedButton.styleFrom(
@@ -599,4 +526,62 @@ class _ProfilePageState extends State<ProfilePage> {
           )),
     );
   }
+
+  _getFromGallery(AuthProvider authProvider) async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    if (pickedFile != null) {
+      callAPIUpdateAvatar(UserRepository(), authProvider, pickedFile.path);
+    }
+  }
+
+  Future<void> callAPIUpdateAvatar(UserRepository userRepository,
+      AuthProvider authProvider, String avatar) async {
+    await userRepository.uploadAvatar(
+        accessToken: authProvider.token?.access?.token ?? "",
+        imagePath: avatar,
+        onSuccess: (user) async {
+          authProvider.saveLoginInfo(user, authProvider.token);
+          initValues(authProvider.currentUser!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully')),
+          );
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
+  Future<void> callAPIUpdateProfile(
+      UserRepository userRepository, AuthProvider authProvider) async {
+    await userRepository.updateInfoUser(
+        accessToken: authProvider.token?.access?.token ?? "",
+        input: UserModel(
+            name: nameController.text,
+            phone: phoneController.text,
+            country: selectedCountry,
+            birthday: DateFormat('yyyy-MM-dd').format(selectedDate),
+            level: selectedLevel,
+            learnTopics: authProvider.currentUser?.learnTopics!,
+            testPreparations: authProvider.currentUser?.testPreparations!,
+            studySchedule:studyScheduleController.text ),
+
+        onSuccess: (user) async {
+          authProvider.saveLoginInfo(user, authProvider.token);
+          initValues(authProvider.currentUser!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully',style: TextStyle(color: Colors.white),),backgroundColor: Colors.green,),
+          );
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
+
 }

@@ -1,10 +1,8 @@
 import 'package:advanced_mobileapp_development/Provider/auth_provider.dart';
-import 'package:advanced_mobileapp_development/presentation/Home/Home.dart';
+import 'package:advanced_mobileapp_development/presentation/ForgotPassword/ForgotPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../main.dart';
-import '../../model/account-dto.dart';
 import 'package:advanced_mobileapp_development/model/user/user.dart';
 
 import '../../model/user/token.dart';
@@ -174,9 +172,18 @@ class _FormLoginState extends State<FormLogin> {
           
           Container(
               margin: EdgeInsets.only(top: 20),
-              child: Text(
-                "Forgot Password?",
-                style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+              
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ForgotPassword()),
+                  );
+                },
+                child: Text(
+                  "Forgot Password?",
+                  style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+                ),
               )),
           Container(
             width: double.infinity,

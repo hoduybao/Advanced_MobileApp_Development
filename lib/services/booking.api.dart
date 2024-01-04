@@ -21,7 +21,7 @@ class BookingRepository extends BaseRepository {
   }) async {
     final response = await service.get(
         url:
-            "list/student?page=$page&perPage=$perPage&dateTimeGte=$now&orderBy=meeting&sortBy=desc",
+        "list/student?page=$page&perPage=$perPage&inFuture=1&orderBy=meeting&sortBy=asc",
         headers: {"Authorization": "Bearer $accessToken"}) as BoundResource;
 
     switch (response.statusCode) {

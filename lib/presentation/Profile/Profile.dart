@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:advanced_mobileapp_development/common/loading.dart';
 import 'package:advanced_mobileapp_development/model/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -40,11 +40,11 @@ class _ProfilePageState extends State<ProfilePage> {
     "PROFICIENCY"
   ];
   List<String> itemsCategory = [
-    'All',
-    'English-For-Kids',
-    'Business-English',
+    'ALL',
+    'ENGLISH-FOR-KIDS',
+    'BUSINESS-ENGLISH',
     'TOEIC',
-    'Conversational',
+    'CONVERSATIONAL',
     "TOEFL",
     'PET',
     "KET",
@@ -52,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
     'TOEFL',
     "STARTERS",
     "MOVERS",
-    "FLYERS",
+    "FLYERS"
   ];
   String selectedLevel = "Beginner";
   List<String> selectedCategory = [];
@@ -60,12 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late bool hasInitValue = false;
   XFile? _pickedFile;
 
-
-
-
-
   void initValues(UserModel userData) {
-
     setState(() {
       nameController.text = userData.name ?? "";
       emailController.text = userData.email ?? "";
@@ -107,17 +102,6 @@ class _ProfilePageState extends State<ProfilePage> {
       userData?.learnTopics?.forEach((element) {
         selectedCategory.add(element.key!.toUpperCase());
       });
-      for(var element in itemsCategory){
-        userData?.learnTopics?.forEach((e) {
-          if(e.key?.toString().compareTo(element.toLowerCase()) != null){
-            check == true;
-
-            setState(() {
-              itemsCategory.add(e.key!.toUpperCase().toString());
-            });
-          }
-        });
-      }
 
       hasInitValue = true;
     });
@@ -125,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    var authProvider=Provider.of<AuthProvider>(context, listen: false);
+    var authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (hasInitValue == false) {
       initValues(authProvider.currentUser!);
@@ -175,115 +159,122 @@ class _ProfilePageState extends State<ProfilePage> {
           // Replace 'assets/icon.png' with your image path
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-          child: Column(
-            children: [
-              SizedBox(height: 40),
-              Center(
-                child: Stack(
+      body: !hasInitValue
+          ? Loading()
+          : SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                child: Column(
                   children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(0.1))
-                          ],
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: _pickedFile != null
-                                  ? FileImage(File(_pickedFile!.path))
-                                      as ImageProvider<Object>
-                                  : NetworkImage(authProvider.currentUser?.avatar ??
-                                      "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg"))),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () {
-                          _getFromGallery(authProvider);
-                        },
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              width: 4,
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                    SizedBox(height: 40),
+                    Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 4,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
+                                boxShadow: [
+                                  BoxShadow(
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      color: Colors.black.withOpacity(0.1))
+                                ],
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: _pickedFile != null
+                                        ? FileImage(File(_pickedFile!.path))
+                                            as ImageProvider<Object>
+                                        : NetworkImage(
+                                            "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg",
+                                          ))),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                _getFromGallery(authProvider);
+                              },
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: 4,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                  ),
+                                  color: Colors.blue.shade700,
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                            color: Colors.blue.shade700,
-                          ),
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Center(
+                      child: Text(
+                        authProvider.currentUser?.name ?? "Anonymous",
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    )
+                    ),
+                    SizedBox(height: 10),
+                    Center(
+                        child: _buildInfo("Account ID: ",
+                            authProvider.currentUser?.id ?? "")),
+                    SizedBox(height: 10),
+                    Center(
+                        child: GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                          child: Text(
+                        "Others review you",
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
+                      )),
+                    )),
+                    SizedBox(height: 10),
+                    Center(
+                        child: GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                          child: Text(
+                        "Change Password",
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
+                      )),
+                    )),
+                    SizedBox(height: 40),
+                    Container(
+                      width: double.infinity,
+                      color: Colors.grey.shade200,
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        "Account",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    _buildForm(authProvider.currentUser!),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
-              Center(
-                child: Text(
-                  authProvider.currentUser?.name ?? "Anonymous",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Center(child: _buildInfo("Account ID: ", authProvider.currentUser?.id ?? "")),
-              SizedBox(height: 10),
-              Center(
-                  child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                    child: Text(
-                  "Others review you",
-                  style: TextStyle(fontSize: 14, color: Colors.blue),
-                )),
-              )),
-              SizedBox(height: 10),
-              Center(
-                  child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                    child: Text(
-                  "Change Password",
-                  style: TextStyle(fontSize: 14, color: Colors.blue),
-                )),
-              )),
-              SizedBox(height: 40),
-              Container(
-                width: double.infinity,
-                color: Colors.grey.shade200,
-                padding: EdgeInsets.all(15),
-                child: Text(
-                  "Account",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              _buildForm(authProvider.currentUser!),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -386,11 +377,9 @@ class _ProfilePageState extends State<ProfilePage> {
     return ElevatedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
+          var authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-          var authProvider=Provider.of<AuthProvider>(context, listen: false);
-
-          callAPIUpdateProfile(UserRepository(),authProvider);
-
+          callAPIUpdateProfile(UserRepository(), authProvider);
         }
       },
       style: ElevatedButton.styleFrom(
@@ -556,6 +545,7 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         });
   }
+
   Future<void> callAPIUpdateProfile(
       UserRepository userRepository, AuthProvider authProvider) async {
     await userRepository.updateInfoUser(
@@ -568,13 +558,18 @@ class _ProfilePageState extends State<ProfilePage> {
             level: selectedLevel,
             learnTopics: authProvider.currentUser?.learnTopics!,
             testPreparations: authProvider.currentUser?.testPreparations!,
-            studySchedule:studyScheduleController.text ),
-
+            studySchedule: studyScheduleController.text),
         onSuccess: (user) async {
           authProvider.saveLoginInfo(user, authProvider.token);
           initValues(authProvider.currentUser!);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully',style: TextStyle(color: Colors.white),),backgroundColor: Colors.green,),
+            const SnackBar(
+              content: Text(
+                'Profile updated successfully',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+            ),
           );
         },
         onFail: (error) {
@@ -583,5 +578,4 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         });
   }
-
 }

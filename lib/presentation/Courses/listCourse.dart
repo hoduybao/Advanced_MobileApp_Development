@@ -35,44 +35,40 @@ class _ListCourseState extends State<ListCourse> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final courseProvider = Provider.of<CourseProvider>(context);
-
     if (!isCallApi) {
       callAPIGetCourseList(1, CourseRepository(), courseProvider, authProvider);
     }
-
     return !isCallApi
         ? Loading()
         : ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: groupedCourses.length,
-            itemBuilder: (context, index) {
-              String type = groupedCourses.keys.elementAt(index);
-              List<CourseModel> typeCourses = groupedCourses[type]!;
-
-              return Container(
-                margin: EdgeInsets.only(top: 30),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        type,
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.w500),
-                      ),
-
-                      Column(
-                        children: typeCourses.map((course) {
-                          return Course(
-                            type: "Course",
-                            course: course,
-                          );
-                        }).toList(),
-                      ),
-                    ]),
-              );
-            },
-          );
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: groupedCourses.length,
+      itemBuilder: (context, index) {
+        String type = groupedCourses.keys.elementAt(index);
+        List<CourseModel> typeCourses = groupedCourses[type]!;
+        return Container(
+          margin: EdgeInsets.only(top: 30),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  type,
+                  style: TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w500),
+                ),
+                Column(
+                  children: typeCourses.map((course) {
+                    return Course(
+                      type: "Course",
+                      course: course,
+                    );
+                  }).toList(),
+                ),
+              ]),
+        );
+      },
+    );
   }
 
   Future<void> callAPIGetCourseList(int page, CourseRepository courseRepository,

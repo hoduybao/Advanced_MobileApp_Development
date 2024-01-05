@@ -8,7 +8,7 @@ import '../../services/user.api.dart';
 import 'Home.dart';
 
 class Tutor extends StatefulWidget {
-  const Tutor(this.tutor, this.isFavorite , this.changeFavorite,{super.key});
+  const Tutor(this.tutor, this.isFavorite, this.changeFavorite, {super.key});
   final TutorModel tutor;
   final bool isFavorite;
   final ChangeFavorite changeFavorite;
@@ -74,7 +74,6 @@ List<Widget> generateRatings(double rating) {
 }
 
 class _TutorState extends State<Tutor> {
-
   @override
   Widget build(BuildContext context) {
     var authProvider = Provider.of<AuthProvider>(context);
@@ -106,28 +105,36 @@ class _TutorState extends State<Tutor> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DetailTutor(widget.tutor,widget.changeFavorite)),
-                      );
-                    },
-                    child: Container(
-                      width: 65, // Đặt chiều rộng của container
-                      height: 65, // Đặt chiều cao của container
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle, // Đặt hình dạng là hình tròn
-                        border: Border.all(
-                          color: Colors.blue, // Màu của đường viền
-                          width: 1, // Độ rộng của đường viền
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DetailTutor(
+                                  widget.tutor, widget.changeFavorite)),
+                        );
+                      },
+                      child: Container(
+                        width: 65, // Đặt chiều rộng của container
+                        height: 65, // Đặt chiều cao của container
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle, // Đặt hình dạng là hình tròn
+                          border: Border.all(
+                            color: Colors.blue, // Màu của đường viền
+                            width: 1, // Độ rộng của đường viền
+                          ),
                         ),
-                      ),
-                      child: ClipOval(
-                        child: Image.network(widget.tutor.avatar ??
-                            "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg"), // Thay thế bằng hình ảnh của bạn
-                      ),
-                    ),
-                  ),
+                        child: ClipOval(
+                          child: Image.network(
+                            widget.tutor.avatar ??
+                                "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg",
+                            errorBuilder: (context, error, stackTrace) {
+                              // You can return a default image or any other widget as a fallback
+                              return Image.network(
+                                  "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg");
+                            },
+                          ),
+                        ),
+                      )),
                   SizedBox(
                     width: 15,
                   ),
@@ -170,7 +177,8 @@ class _TutorState extends State<Tutor> {
                   color: widget.isFavorite ? Colors.red : Colors.blueAccent,
                 ),
                 onPressed: () {
-                  callApiManageFavoriteTutor( widget.tutor.userId!,authProvider);
+                  callApiManageFavoriteTutor(
+                      widget.tutor.userId!, authProvider);
                 },
               )
             ],
@@ -241,6 +249,7 @@ class _TutorState extends State<Tutor> {
       ),
     );
   }
+
   Future<void> callApiManageFavoriteTutor(
       String tutorID, AuthProvider authProvider) async {
     UserRepository userRepository = UserRepository();
@@ -255,9 +264,10 @@ class _TutorState extends State<Tutor> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: Colors.green,
-              content: Text("Update favorite tutor successful",style: TextStyle(
-                color: Colors.white
-              ),),
+              content: Text(
+                "Update favorite tutor successful",
+                style: TextStyle(color: Colors.white),
+              ),
               duration: const Duration(seconds: 1),
             ),
           );

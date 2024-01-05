@@ -16,6 +16,7 @@ class _ContentState extends State<Content> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
@@ -116,7 +117,7 @@ class _ContentState extends State<Content> {
           ),
         ),
         Visibility(visible: isActived == 2, child: ListBook()),
-        Visibility(visible: isActived == 1, child: Expanded(child: ListCourse())),
+        Visibility(visible: isActived == 1, child: ListCourse()),
 
       ],
     );

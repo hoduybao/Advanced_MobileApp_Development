@@ -236,7 +236,7 @@ class _SessionState extends State<Session> {
                               ),
                             )),
                             child: Text(
-                              widget.schedule?.scheduleDetailInfo?.bookingInfo?[0]?.studentRequest!??"",
+                              widget.schedule?.scheduleDetailInfo?.bookingInfo?[0]?.studentRequest!??"Hello",
                               style: TextStyle(fontSize: 14),
                             ))
                       ],

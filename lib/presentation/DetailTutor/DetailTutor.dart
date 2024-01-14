@@ -17,6 +17,7 @@ import '../../Provider/auth_provider.dart';
 import '../../common/loading.dart';
 import '../../model/tutor/infor.dart';
 import '../../services/tutors.api.dart';
+import '../../services/user.api.dart';
 
 class DetailTutor extends StatefulWidget {
   const DetailTutor(this.tutor, this.changeFavorite, {super.key});
@@ -29,7 +30,7 @@ class DetailTutor extends StatefulWidget {
 class _DetailTutorState extends State<DetailTutor> {
   late TutorModel tutorData;
   late TutorInfo tutorInfo;
-  bool loading = false;
+  bool loading = true;
 
   List<Widget> generateRatings(double rating) {
     int realRating = rating.toInt();
@@ -57,13 +58,18 @@ class _DetailTutorState extends State<DetailTutor> {
 
   @override
   void initState() {
-    tutorData = widget.tutor;
+    setState(() {
+      tutorData = widget.tutor;
+    });
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    setState(() {
+      tutorData = widget.tutor;
+    });
     callAPIGetTutorById(TutorRepository(),
         Provider.of<AuthProvider>(context, listen: false), tutorData.userId);
   }
@@ -85,6 +91,8 @@ class _DetailTutorState extends State<DetailTutor> {
 
   @override
   Widget build(BuildContext context) {
+    var authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
         appBar: PreferredSize(
           preferredSize:
@@ -134,7 +142,7 @@ class _DetailTutorState extends State<DetailTutor> {
             onRefresh: () async {
               refreshHome();
             },
-            child: !loading
+            child: (loading || tutorData==null)
                 ? Loading()
                 : SingleChildScrollView(
                     child: Container(
@@ -236,8 +244,8 @@ class _DetailTutorState extends State<DetailTutor> {
                                 children: [
                                   IconButton(
                                       onPressed: () {
-                                        widget
-                                            .changeFavorite(tutorData.userId!);
+                                        callApiManageFavoriteTutor(tutorData.userId!,authProvider);
+
                                       },
                                       icon: Icon(
                                         tutorInfo.isFavorite!
@@ -282,12 +290,42 @@ class _DetailTutorState extends State<DetailTutor> {
                           ChewieDemo(linkVideo: tutorInfo.video!),
                           InfoDetail(tutorInfo!),
                           SizedBox(height: 20),
-                          ListReview(tutorData.feedbacks!.sublist(0, 10)),
+                          ListReview(tutorData.feedbacks?.sublist(0, 10) ?? []),
                           SizedBox(height: 20),
                           Booking(tutor: widget.tutor)
                         ])))));
   }
 
+  Future<void> callApiManageFavoriteTutor(
+      String tutorID, AuthProvider authProvider) async {
+    UserRepository userRepository = UserRepository();
+
+
+    await userRepository.favoriteTutor(
+        accessToken: authProvider.token?.access?.token ?? "",
+        tutorId: tutorID!,
+        onSuccess: (message, unfavored) async {
+          setState(() {
+            widget.changeFavorite(tutorID);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              content: Text(
+                "Update favorite tutor successful",
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
+  }
   Future<void> callAPIGetTutorById(TutorRepository tutorRepository,
       AuthProvider authProvider, String? userId) async {
     await tutorRepository.getTutorById(
@@ -296,7 +334,7 @@ class _DetailTutorState extends State<DetailTutor> {
         onSuccess: (response) async {
           setState(() {
             tutorInfo = response;
-            loading = true;
+            loading = false;
           });
         },
         onFail: (error) {

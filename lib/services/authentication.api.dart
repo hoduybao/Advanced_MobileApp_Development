@@ -19,6 +19,8 @@ class AuthRepository extends BaseRepository {
       "email": email,
       "password": password,
     }) as BoundResource;
+
+
     print(response.statusCode);
     switch (response.statusCode) {
       case 200:

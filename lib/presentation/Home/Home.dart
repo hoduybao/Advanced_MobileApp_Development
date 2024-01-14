@@ -5,20 +5,20 @@ import 'package:advanced_mobileapp_development/presentation/Courses/Courses.dart
 import 'package:advanced_mobileapp_development/presentation/History/History.dart';
 import 'package:advanced_mobileapp_development/presentation/Home/searchTutor.dart';
 import 'package:advanced_mobileapp_development/presentation/Schedule/Schedule.dart';
+import 'package:advanced_mobileapp_development/services/call.api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
-import 'package:flutter_pagination/flutter_pagination.dart';
+import 'package:pagination_flutter/pagination.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
 import '../../model/schedule/booking_infor.dart';
 import '../../model/tutor/tutor_model.dart';
-import '../../responses/list_tutor_response.dart';
 import '../../services/booking.api.dart';
 import '../../services/tutors.api.dart';
-import '../../styles/styles.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(
@@ -37,8 +37,8 @@ class _HomeState extends State<Home> {
 
   List<String> _favTutorsId = [];
 
-  int currentPage = 1;
-  int maxPage = 1;
+  int _numPages = 6;
+  int _currentPage = 1;
 
   bool isLoading = true;
   //Đã call api này chưa
@@ -46,7 +46,7 @@ class _HomeState extends State<Home> {
 
   //Upcoming
   String totalLessonTime = "";
-  BookingInfo upcomingLesson =  BookingInfo();
+  BookingInfo upcomingLesson = BookingInfo();
   //search
   String specialities = 'all';
   String nameTutor = "";
@@ -59,8 +59,10 @@ class _HomeState extends State<Home> {
     //Fetch API
     if (!hasCallAPI) {
       await Future.wait([
-        callAPIGetTutorList(1, TutorRepository(), authProvider),
-        callApiGetListSchedules(BookingRepository(), authProvider)
+        searchTutor(1, TutorRepository(), authProvider,
+            specialities == "all" ? "" : specialities, nameTutor, national),
+        callApiGetListSchedules(BookingRepository(), authProvider),
+        callAPIGetTotalLessonTime(CallRepository(), authProvider)
       ]).whenComplete(() {
         if (mounted) {
           setState(() {
@@ -80,8 +82,10 @@ class _HomeState extends State<Home> {
       isLoading = true;
     });
     await Future.wait([
-      callAPIGetTutorList(1, TutorRepository(), authProvider),
-      callApiGetListSchedules(BookingRepository(), authProvider)
+      searchTutor(1, TutorRepository(), authProvider,
+          specialities == "all" ? "" : specialities, nameTutor, national),
+      callApiGetListSchedules(BookingRepository(), authProvider),
+      callAPIGetTotalLessonTime(CallRepository(), authProvider),
     ]).whenComplete(() {
       setState(() {
         isLoading = false;
@@ -135,7 +139,7 @@ class _HomeState extends State<Home> {
         national = nationality;
       });
 
-      searchTutor(currentPage, TutorRepository(), authProvider,
+      searchTutor(1, TutorRepository(), authProvider,
           filter == "all" ? "" : filter, nameTutor, nationality);
     }
 
@@ -328,64 +332,78 @@ class _HomeState extends State<Home> {
           onRefresh: () async {
             refreshHome(authProvider);
           },
-          child:isLoading?Loading():SingleChildScrollView(
-              child: Container(
-                  child: Column(children: [
-            (upcomingLesson != null)
-                ? UpcomingLesson(
-                    upcominglesson: upcomingLesson,
-                    totalLessonTime: totalLessonTime,
-                  )
-                : const SizedBox(),
-            SearchTutor(filterCallback),
-            Divider(
-              // Add a horizontal line
-              color: Colors.grey, // Line color
-              height: 10, // Line height
-              thickness: 0.5, // Line thickness
-              indent: 20, // Line indent on the left
-              endIndent: 10, // Line indent on the right
-            ),
-            ListTutors(_tutorList, _favTutorsId, changeFavorite),
-            Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(16),
-                child: Pagination(
-                  paginateButtonStyles: paginationStyle(context),
-                  prevButtonStyles: prevButtonStyles(context),
-                  nextButtonStyles: nextButtonStyles(context),
-                  onPageChange: (number) {
-                    setState(() {
-                      isLoading = true;
-                      currentPage = number;
-                    });
-                    //Call API
-                    searchTutor(number, TutorRepository(), authProvider,
-                        specialities, nameTutor, national);
-                  },
-                  useGroup: false,
-                  totalPage: maxPage,
-                  show: maxPage - 1,
-                  currentPage: currentPage,
-                ))
-          ]))),
-        ));
-  }
+          child: isLoading
+              ? Loading()
+              : SingleChildScrollView(
+                  child: Container(
+                      child: Column(children: [
+                  (upcomingLesson != null)
+                      ? UpcomingLesson(
+                          upcominglesson: upcomingLesson,
+                          totalLessonTime: totalLessonTime,
+                        )
+                      : const SizedBox(),
+                  SearchTutor(filterCallback),
+                  Divider(
+                    // Add a horizontal line
+                    color: Colors.grey, // Line color
+                    height: 10, // Line height
+                    thickness: 0.5, // Line thickness
+                    indent: 20, // Line indent on the left
+                    endIndent: 10, // Line indent on the right
+                  ),
+                  ListTutors(_tutorList, _favTutorsId, changeFavorite),
+                  Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(16),
+                      child: Pagination(
+                        numOfPages: _numPages,
+                        selectedPage: _currentPage,
+                        pagesVisible: 4,
+                        onPageChanged: (page) {
+                          setState(() {
+                            isLoading=true;
+                            _currentPage = page;
+                          });
 
-  Future<void> callAPIGetTutorList(int page, TutorRepository tutorRepository,
-      AuthProvider authProvider) async {
-    await tutorRepository.getListTutor(
-        accessToken: authProvider.token?.access?.token ?? "",
-        page: page,
-        perPage: 10,
-        onSuccess: (response) async {
-          _handleTutorListDataFromAPI(response);
-        },
-        onFail: (error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${error.toString()}')),
-          );
-        });
+                          searchTutor(page, TutorRepository(), authProvider, specialities == "all" ? "" : specialities, nameTutor, national);
+
+                        },
+                        nextIcon: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.blue,
+                          size: 14,
+                        ),
+                        previousIcon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.blue,
+                          size: 14,
+                        ),
+                        activeTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        activeBtnStyle: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.blue),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                        ),
+                        inactiveBtnStyle: ButtonStyle(
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          )),
+                        ),
+                        inactiveTextStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),)
+                ]))),
+        ));
   }
 
   Future<void> callApiGetListSchedules(
@@ -396,7 +414,7 @@ class _HomeState extends State<Home> {
         perPage: 100000,
         now: DateTime.now().millisecondsSinceEpoch.toString(),
         onSuccess: (response, total) async {
-          _filterListScheduleFromApi(response);
+          filterListScheduleFromApi(response);
         },
         onFail: (error) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -405,16 +423,28 @@ class _HomeState extends State<Home> {
         });
   }
 
-  int getShowPagesBasedOnPages(int pages) {
-    if (pages > 2) {
-      return 2;
-    } else if (pages == 2) {
-      return 1;
-    } else if (pages <= 1) {
-      return 0;
-    } else {
-      return 0;
-    }
+  Future<void> callAPIGetTotalLessonTime(
+      CallRepository callRepository, AuthProvider authProvider) async {
+    await callRepository.getTotalLessonTime(
+        accessToken: authProvider.token?.access?.token ?? "",
+        onSuccess: (int total) async {
+          if (total > 0) {
+            int hours = total ~/ 60; // Số giờ
+            int minutes = total % 60; // Số phút
+            if (hours >= 1) {
+              String timeString = "${hours} hours ${minutes} minutes";
+              totalLessonTime = timeString;
+            } else {
+              String timeString = "${minutes} minutes";
+              totalLessonTime = timeString;
+            }
+          }
+        },
+        onFail: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${error.toString()}')),
+          );
+        });
   }
 
   Future<void> searchTutor(
@@ -428,15 +458,38 @@ class _HomeState extends State<Home> {
         accessToken: authProvider.token!.access!.token ?? "",
         page: page,
         searchKeys: name,
-        speciality: [filter],
+        speciality: filter!="all"? [filter]:[],
         nationality: nationality,
         onSuccess: (response, total) async {
+
+
+          _favTutorsId=[];
+          //Separate list
+          List<TutorModel> notFavoredList = [];
+          List<TutorModel> favoredList = [];
+          response?.forEach((element) {
+            if (checkIfTutorIsFavorite(element)) {
+              favoredList.add(element);
+              _favTutorsId.add(element.id!);
+            } else {
+              notFavoredList.add(element);
+            }
+          });
+
+          //Sort by score
+          favoredList
+              .sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
+          notFavoredList
+              .sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
+
+          //Add to final list
           _tutorList = [];
-          _tutorList.addAll(response);
+          _tutorList.addAll(favoredList);
+          _tutorList.addAll(notFavoredList);
+
           setState(() {
+            _numPages = (total / 10).ceil();
             isLoading = false;
-            currentPage = page;
-            maxPage = (total / 10).ceil();
           });
         },
         onFail: (error) {
@@ -446,71 +499,23 @@ class _HomeState extends State<Home> {
         });
   }
 
-  void _handleTutorListDataFromAPI(ResponseGetListTutor response) {
-    response.favoriteTutor?.forEach((element) {
-      if (element.secondId != null) {
-        _favTutorsId.add(element.secondId!);
-      }
-    });
-
-    //Separate list
-    List<TutorModel> notFavoredList = [];
-    List<TutorModel> favoredList = [];
-    response.tutors?.rows?.forEach((element) {
-      if (checkIfTutorIsFavorite(element)) {
-        favoredList.add(element);
-      } else {
-        notFavoredList.add(element);
-      }
-    });
-
-    //Sort by score
-    favoredList.sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
-    notFavoredList.sort((b, a) => (a.rating ?? 0).compareTo((b.rating ?? 0)));
-
-    //Add to final list
-    _tutorList.addAll(favoredList);
-    _tutorList.addAll(notFavoredList);
-  }
-
   bool checkIfTutorIsFavorite(TutorModel tutor) {
-    for (var element in _favTutorsId) {
-      if (element == tutor.userId) return true;
+    if (tutor.isFavoriteTutor != null) {
+      if (tutor.isFavoriteTutor==true) return true;
     }
+
     return false;
   }
 
-  void _filterListScheduleFromApi(List<BookingInfo> listBooking) {
+  void filterListScheduleFromApi(List<BookingInfo> listBooking) {
     for (var value in listBooking) {
       if (value.isDeleted != true) {
         lessonList.insert(0, value);
       }
     }
-
-    //Calculate total learning time
-    DateTime totalTime = DateTime.now();
-    DateTime nowTime = totalTime;
-    for (var element in lessonList) {
-      var startTime = DateTime.fromMillisecondsSinceEpoch(
-          element.scheduleDetailInfo!.startPeriodTimestamp!);
-      var endTime = DateTime.fromMillisecondsSinceEpoch(
-          element.scheduleDetailInfo!.endPeriodTimestamp!);
-      var learningDuration = endTime.difference(startTime);
-      totalTime = totalTime.add(learningDuration);
-    }
-    Duration learningDuration = totalTime.difference(nowTime);
-
     if (lessonList.isNotEmpty) {
       upcomingLesson = lessonList.first;
-      totalLessonTime = _printDuration(learningDuration);
     }
-  }
-
-  String _printDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }
 
@@ -565,37 +570,38 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
                   flex: 1,
                   child: Column(
                     children: [
-                      (widget.upcominglesson.scheduleDetailInfo!=null)?
-                      Text(
-                        DateFormat('EEEE, MMMM d').format(
-                            DateTime.fromMillisecondsSinceEpoch(widget
-                                .upcominglesson
-                                .scheduleDetailInfo!
-                                .startPeriodTimestamp!)),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ):const SizedBox(),
+                      (widget.upcominglesson.scheduleDetailInfo != null)
+                          ? Text(
+                              DateFormat('EEEE, MMMM d').format(
+                                  DateTime.fromMillisecondsSinceEpoch(widget
+                                      .upcominglesson
+                                      .scheduleDetailInfo!
+                                      .startPeriodTimestamp!)),
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            )
+                          : const SizedBox(),
                       Text(
                         convertTimeToString(
-                            widget.upcominglesson.scheduleDetailInfo!=null
-
+                            widget.upcominglesson.scheduleDetailInfo != null
                                 ? widget.upcominglesson.scheduleDetailInfo!
                                     .startPeriodTimestamp!
                                 : 0,
-                            widget.upcominglesson.scheduleDetailInfo!=null
-
+                            widget.upcominglesson.scheduleDetailInfo != null
                                 ? widget.upcominglesson.scheduleDetailInfo!
                                     .endPeriodTimestamp!
                                 : 0),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
-                      (widget.upcominglesson.scheduleDetailInfo!=null)?
-                      CountdownTimer(
-                        endTime: widget.upcominglesson.scheduleDetailInfo!
-                            .startPeriodTimestamp!,
-                        textStyle: TextStyle(color: Colors.yellow),
-                        ):const SizedBox(),
+                      (widget.upcominglesson.scheduleDetailInfo != null)
+                          ? CountdownTimer(
+                              endTime: widget.upcominglesson.scheduleDetailInfo!
+                                  .startPeriodTimestamp!,
+                              textStyle: TextStyle(color: Colors.yellow),
+                            )
+                          : const SizedBox(),
                     ],
                   ),
                 ),
@@ -648,7 +654,7 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
               child: Text(
                 (widget.totalLessonTime.isEmpty)
                     ? "Total lesson time is 0"
-                    : "Total lesson time is: ${widget.totalLessonTime}",
+                    : "Total lesson time is ${widget.totalLessonTime}",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,

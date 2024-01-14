@@ -248,6 +248,8 @@ class _ScheduleState extends State<Schedule> {
               ? Loading()
               : SingleChildScrollView(
                   child: Container(
+                    constraints: BoxConstraints(
+                        minHeight: 600),
                     padding: EdgeInsets.all(25),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

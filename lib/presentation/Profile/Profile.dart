@@ -32,10 +32,10 @@ class _ProfilePageState extends State<ProfilePage> {
   String selectedCountry = "Vietnam";
   List<String> itemsLevel = [
     "BEGINNER",
-    "HIGHER-BEGINNER",
-    "PRE-INTERMEDIATE",
+    "HIGHER_BEGINNER",
+    "PRE_INTERMEDIATE",
     "INTERMEDIATE",
-    "UPPER-INTERMEDIATE",
+    "UPPER_INTERMEDIATE",
     "ADVANCED",
     "PROFICIENCY"
   ];
@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
       selectedDate =
           DateTime.parse(userData.birthday ?? DateTime.now().toString());
 
-      String level = userData.level ?? "Beginner";
+      String level = userData.level ?? "BEGINNER";
       check = false;
       for (var element in itemsLevel) {
         if (element.toLowerCase().compareTo(level.toLowerCase()) == 0) {

@@ -126,11 +126,11 @@ class _TutorState extends State<Tutor> {
                         child: ClipOval(
                           child: Image.network(
                             widget.tutor.avatar ??
-                                "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg",
+                                "",
                             errorBuilder: (context, error, stackTrace) {
                               // You can return a default image or any other widget as a fallback
                               return Image.network(
-                                  "https://api.app.lettutor.com/avatar/e9e3eeaa-a588-47c4-b4d1-ecfa190f63faavatar1632109929661.jpg");
+                                  "");
                             },
                           ),
                         ),
@@ -142,12 +142,14 @@ class _TutorState extends State<Tutor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        // onTap: () {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(builder: (context) => DetailTutor(widget.tutor)),
-                        //   );
-                        // },
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailTutor(
+                                    widget.tutor, widget.changeFavorite)),
+                          );
+                        },
                         child: Text(
                           widget.tutor.name ?? "",
                           style: TextStyle(
@@ -178,7 +180,7 @@ class _TutorState extends State<Tutor> {
                 ),
                 onPressed: () {
                   callApiManageFavoriteTutor(
-                      widget.tutor.userId!, authProvider);
+                      widget.tutor.id!, authProvider);
                 },
               )
             ],
@@ -202,7 +204,14 @@ class _TutorState extends State<Tutor> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DetailTutor(
+                              widget.tutor, widget.changeFavorite)),
+                    );
+                  },
                   style: ButtonStyle(
                     side: MaterialStateProperty.all(
                       BorderSide(

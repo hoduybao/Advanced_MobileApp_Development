@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:json_annotation/json_annotation.dart';
 
 import 'feedback.dart';
@@ -48,6 +50,7 @@ class TutorModel {
   bool? isNative;
   int? price;
   bool? isOnline;
+  bool? isFavoriteTutor;
   TutorInfo? tutorInfo;
 
   TutorModel({
@@ -91,6 +94,7 @@ class TutorModel {
     this.languages,
     this.specialties,
     this.resume,
+    this.isFavoriteTutor,
     this.rating,
     this.isNative,
     this.price,
@@ -141,6 +145,7 @@ class TutorModel {
         specialties: json['specialties'] as String?,
         resume: json['resume'] as String?,
         rating: (json['rating'] as num?)?.toDouble(),
+        isFavoriteTutor: json['isFavoriteTutor'] as bool?,
         isNative: json['isNative'] as bool?,
         price: json['price'] as int?,
         isOnline: json['isOnline'] as bool?,
@@ -189,6 +194,7 @@ class TutorModel {
     'specialties': specialties,
     'resume': resume,
     'rating': rating,
+    "isFavoriteTutor":isFavoriteTutor,
     'isNative': isNative,
     'price': price,
     'isOnline': isOnline,

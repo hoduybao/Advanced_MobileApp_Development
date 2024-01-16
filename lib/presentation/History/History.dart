@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pagination_flutter/pagination.dart';
 import 'package:provider/provider.dart';
 
 import '../../Provider/auth_provider.dart';
@@ -27,7 +28,8 @@ class _HistoryState extends State<History> {
   bool loading = true;
 
   //Pagination
-  int currentPage = 1;
+  int _numPages = 1;
+  int _currentPage = 1;
 
   @override
   void didChangeDependencies() {
@@ -39,9 +41,28 @@ class _HistoryState extends State<History> {
       callApiGetHistoryLesson(1, BookingRepository(), authProvider);
     }
   }
+  Future<void> refreshSchedule() async {
+    setState(() {
+      listHistoryLesson = [];
+      loading = true;
+    });
+    await Future.wait([
+      callApiGetHistoryLesson(1, BookingRepository(),
+          Provider.of<AuthProvider>(context, listen: false)),
+    ]).whenComplete(() {
+      setState(() {
+        loading = false;
+      });
+      return Future<void>.delayed(const Duration(seconds: 0));
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider =
+    Provider.of<AuthProvider>(context, listen: false);
     return Scaffold(
       endDrawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -226,7 +247,11 @@ class _HistoryState extends State<History> {
               )),
         ),
       ),
-      body: loading? Loading(): SingleChildScrollView(
+      body:RefreshIndicator(
+      onRefresh: () async {
+    refreshSchedule();
+    },
+    child: loading? Loading(): SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(25),
           child:
@@ -277,10 +302,66 @@ class _HistoryState extends State<History> {
                 // Add more customization here if needed
               },
             ),
+                SizedBox(
+                  height: 20,
+                ),
+                Visibility(
+                  visible: _numPages>1,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Pagination(
+                      numOfPages: _numPages,
+                      selectedPage: _currentPage,
+                      pagesVisible: 3,
+                      onPageChanged: (page) {
+                        setState(() {
+                          loading=true;
+                          _currentPage = page;
+                        });
+
+                        callApiGetHistoryLesson(page, BookingRepository(), authProvider);
+
+
+
+                      },
+                      nextIcon: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.blue,
+                        size: 14,
+                      ),
+                      previousIcon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.blue,
+                        size: 14,
+                      ),
+                      activeTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      activeBtnStyle: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                      ),
+                      inactiveBtnStyle: ButtonStyle(
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        )),
+                      ),
+                      inactiveTextStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),),
+                )
           ]),
         ),
       ),
-    );
+    ));
   }
 
   Future<void> callApiGetHistoryLesson(int page,
@@ -288,7 +369,7 @@ class _HistoryState extends State<History> {
     await bookingRepository.getHistoryLesson(
         accessToken: authProvider.token?.access?.token ?? "",
         page: page,
-        perPage: 20,
+        perPage: 10,
         now: DateTime.now().millisecondsSinceEpoch.toString(),
         onSuccess: (response, total) async {
           listHistoryLesson = [];
@@ -298,11 +379,12 @@ class _HistoryState extends State<History> {
               listHistoryLesson.add(value);
             }
           }
+
           setState(() {
+            _numPages=total;
             isCallApi = true;
             loading = false;
           });
-          currentPage = page;
         },
         onFail: (error) {
           ScaffoldMessenger.of(context).showSnackBar(

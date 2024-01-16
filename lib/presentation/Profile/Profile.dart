@@ -115,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
       initValues(authProvider.currentUser!);
     }
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize:
             const Size.fromHeight(50.0), // Define the height of the AppBar

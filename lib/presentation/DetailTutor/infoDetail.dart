@@ -1,6 +1,4 @@
-import 'package:advanced_mobileapp_development/model/tutor.dart';
 import 'package:advanced_mobileapp_development/model/tutor/infor.dart';
-import 'package:advanced_mobileapp_development/presentation/DetailCourse/DetailCourse.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

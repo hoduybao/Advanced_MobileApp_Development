@@ -1,15 +1,12 @@
-import 'package:advanced_mobileapp_development/model/feedback-dto.dart';
 import 'package:advanced_mobileapp_development/model/tutor/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
-import '../../model/rate-dto.dart';
 
 class Review extends StatelessWidget {
 
   const Review(this.rate,{super.key});
-  final TutorFeedback rate;
+  final FeedbackDTO rate;
 
   String formatTimeAgo(String apiTime) {
     DateTime currentTime = DateTime.now();

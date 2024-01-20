@@ -1,10 +1,11 @@
+import 'package:advanced_mobileapp_development/model/tutor/firstInfor.dart';
 import 'package:advanced_mobileapp_development/model/tutor/tutor_tranfered_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 
 
 @JsonSerializable()
-class TutorFeedback {
+class FeedbackDTO {
   String? id;
   String? bookingId;
   String? firstId;
@@ -13,9 +14,9 @@ class TutorFeedback {
   String? content;
   String? createdAt;
   String? updatedAt;
-  TutorTranferedData? firstInfo;
+  FirstInfor? firstInfo;
 
-  TutorFeedback({
+  FeedbackDTO({
     this.id,
     this.bookingId,
     this.firstId,
@@ -27,8 +28,8 @@ class TutorFeedback {
     this.firstInfo,
   });
 
-  factory TutorFeedback.fromJson(Map<String, dynamic> json) =>
-      TutorFeedback(
+  factory FeedbackDTO.fromJson(Map<String, dynamic> json) =>
+      FeedbackDTO(
         id: json['id'] as String?,
         bookingId: json['bookingId'] as String?,
         firstId: json['firstId'] as String?,
@@ -39,7 +40,7 @@ class TutorFeedback {
         updatedAt: json['updatedAt'] as String?,
         firstInfo: json['firstInfo'] == null
             ? null
-            : TutorTranferedData.fromJson(
+            : FirstInfor.fromJson(
             json['firstInfo'] as Map<String, dynamic>),
       );
   Map<String, dynamic> toJson() => <String, dynamic>{

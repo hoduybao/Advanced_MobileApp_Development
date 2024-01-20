@@ -80,8 +80,28 @@ class _ProfilePageState extends State<ProfilePage> {
           countries.add(country);
         });
       }
-      selectedDate =
-          DateTime.parse(userData.birthday ?? DateTime.now().toString());
+      if(userData.birthday!=null) {
+        List<String> dateComponents = userData.birthday!.split('-');
+
+        if (dateComponents.length == 3) {
+          String year = dateComponents[0];
+          String month = dateComponents[1];
+          String day = dateComponents[2];
+
+          // Chuyển đổi thành DateTime để kiểm tra tính hợp lệ
+
+          DateTime dateTime = DateTime(
+              int.parse(year), int.parse(month), int.parse(day));
+
+          // Nếu không có ngoại lệ, ngày tháng là hợp lệ
+          String formattedDateString = "${dateTime.year}-${dateTime.month
+              .toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(
+              2, '0')}";
+          selectedDate =
+              DateTime.parse(formattedDateString);
+        }
+      }
+
 
       String level = userData.level ?? "BEGINNER";
       check = false;

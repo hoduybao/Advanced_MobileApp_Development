@@ -110,7 +110,7 @@ class _TutorState extends State<Tutor> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => DetailTutor(
-                                  widget.tutor, widget.changeFavorite)),
+                                  widget.tutor)),
                         );
                       },
                       child: Container(
@@ -147,7 +147,7 @@ class _TutorState extends State<Tutor> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => DetailTutor(
-                                    widget.tutor, widget.changeFavorite)),
+                                    widget.tutor)),
                           );
                         },
                         child: Text(
@@ -209,7 +209,7 @@ class _TutorState extends State<Tutor> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => DetailTutor(
-                              widget.tutor, widget.changeFavorite)),
+                              widget.tutor)),
                     );
                   },
                   style: ButtonStyle(

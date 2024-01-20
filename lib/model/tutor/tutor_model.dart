@@ -32,7 +32,7 @@ class TutorModel {
   String? updatedAt;
   String? deletedAt;
   String? studentGroupId;
-  List<TutorFeedback>? feedbacks;
+  List<FeedbackDTO>? feedbacks;
   String? id;
   String? userId;
   String? video;
@@ -129,7 +129,7 @@ class TutorModel {
         deletedAt: json['deletedAt'] as String?,
         studentGroupId: json['studentGroupId'] as String?,
         feedbacks: (json['feedbacks'] as List<dynamic>?)
-            ?.map((e) => TutorFeedback.fromJson(e as Map<String, dynamic>))
+            ?.map((e) => FeedbackDTO.fromJson(e as Map<String, dynamic>))
             .toList(),
         id: json['id'] as String?,
         userId: json['userId'] as String?,

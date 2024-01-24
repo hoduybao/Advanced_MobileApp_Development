@@ -19,6 +19,7 @@ import '../../model/schedule/booking_infor.dart';
 import '../../model/tutor/tutor_model.dart';
 import '../../services/booking.api.dart';
 import '../../services/tutors.api.dart';
+import '../MeetingLessonPage/MeetingLessonPage.dart';
 import 'listTutors.dart';
 
 typedef FilterCallback = void Function(
@@ -620,11 +621,12 @@ class _UpcomingLessonState extends State<UpcomingLesson> {
                         ),
                       ),
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => JoinMeetingPage(upcomingClass: widget.upcominglesson)),
-                        // );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MeetingLessonPage(upcomingClass: widget.upcominglesson)),
+                        );
                       },
                       child: Row(
                         children: [

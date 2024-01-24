@@ -27,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController studyScheduleController = TextEditingController();
+  String linkAvatar="";
   // Define the list of countries
   List<String> countries = ['Vietnam', 'United States', 'Canada', 'Other'];
   String selectedCountry = "Vietnam";
@@ -62,6 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void initValues(UserModel userData) {
     setState(() {
+      linkAvatar=userData.avatar??"";
       nameController.text = userData.name ?? "";
       emailController.text = userData.email ?? "";
       phoneController.text = userData.phone ?? "";
@@ -212,7 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ? FileImage(File(_pickedFile!.path))
                                             as ImageProvider<Object>
                                         : NetworkImage(
-                                            "https://sandbox.api.lettutor.com/avatar/f569c202-7bbf-4620-af77-ecc1419a6b28avatar1700296337596.jpg",
+                                      linkAvatar,
                                           ))),
                           ),
                           Positioned(
@@ -399,7 +401,6 @@ class _ProfilePageState extends State<ProfilePage> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           var authProvider = Provider.of<AuthProvider>(context, listen: false);
-
           callAPIUpdateProfile(UserRepository(), authProvider);
         }
       },
@@ -557,7 +558,10 @@ class _ProfilePageState extends State<ProfilePage> {
           authProvider.saveLoginInfo(user, authProvider.token);
           initValues(authProvider.currentUser!);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully')),
+
+            const SnackBar(content: Text('Profile updated successfully',style: TextStyle(
+              color: Colors.white
+            ),),backgroundColor: Colors.green,),
           );
         },
         onFail: (error) {

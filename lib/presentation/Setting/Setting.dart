@@ -154,7 +154,8 @@ class _SettingPageState extends State<SettingPage> {
               title: const Text('Logout',
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
               onTap: () {
-                var authProvider=context.watch<AuthProvider>();
+                var authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
                 authProvider.clearUserInfo();
               },
             ),

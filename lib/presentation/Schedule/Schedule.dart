@@ -318,7 +318,7 @@ class _ScheduleState extends State<Schedule> {
                               child: Pagination(
                                 numOfPages: _numPages,
                                 selectedPage: _currentPage,
-                                pagesVisible: 4,
+                                pagesVisible: 3,
                                 onPageChanged: (page) {
                                   setState(() {
                                     loading=true;
